@@ -1,170 +1,117 @@
 # DSH Desktop MCP Bridge
 
-[简体中文](README.zh-CN.md) · [Source audit](docs/UPSTREAM-AUDIT.md) · [Security](SECURITY.md) · [Protocol](docs/PROTOCOL.md)
+[简体中文](README.zh-CN.md) · [Setup guide](docs/CODEX-PLUGIN.md) · [Validation](docs/VALIDATION.md) · [Security](SECURITY.md)
 
-An **unofficial, opt-in** TypeScript bridge that lets Codex Desktop/CLI delegate to the **already running official DeepSeek Harness Desktop**. It does not launch `dsh`, a CLI agent, a Web server, or another Harness runtime. The only additional process launched by Codex is the MCP stdio server.
+Let **Codex Desktop / CLI delegate tasks to your already running official DeepSeek Harness Desktop**, using its existing model configuration and runtime. Each delegated session gets a separate directory or Git worktree for Codex to review.
 
-**Status: experimental v0.2.0.** The adapter targets official **DSH `0.2.0-rc.2`**, the locally observed macOS release. Other DSH core versions fail closed. Official master was `0.2.1-rc.1` at audit time; this is **not** a claim of compatibility with master or future Desktop releases. Real macOS Desktop plugin activation and paid/live model execution still need a user-run acceptance test. See [validation](docs/VALIDATION.md).
+This is an **unofficial, opt-in bridge**. It uses a plugin inside the existing Desktop Host and an authenticated local Unix socket. Codex starts the MCP stdio server; the bridge never launches another DSH CLI/Web runtime or extracts Desktop authentication secrets. [Architecture and source audit](docs/UPSTREAM-AUDIT.md).
 
-```text
-Codex Desktop / CLI
-  └─ MCP stdio server (Node)
-       └─ authenticated local Unix socket (no TCP)
-            └─ opt-in Cordis plugin in the existing Desktop Host
-                 └─ official agents.create + preset.mount + followup
-                      └─ configured model, preset, Skills and allowed Tools
-                           └─ separate session + separate workspace/worktree
+## Compatibility and status
+
+**Experimental v0.2.0.** Automated integration and packaging checks have passed; installation inside the actual signed macOS Desktop application and real model execution **remain unverified**. See the [validation record and acceptance procedure](docs/VALIDATION.md).
+
+| Component       | Requirement / verified scope                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| DSH Desktop     | Official macOS **0.2.0-rc.2**, Cordis **4.0.4**; other core versions are rejected                             |
+| Codex           | Local Desktop/CLI with portable Agent Plugins support; discovery verified with CLI **0.163.0-alpha.10.2**     |
+| Node.js         | **>=22.19.0**, accessible to Codex                                                                            |
+| Git             | Required for repository worktrees                                                                             |
+| Other platforms | Linux transport is testable; Linux Desktop compatibility is not claimed; Windows transport is not implemented |
+
+A new session takes the Desktop **default model at creation** and an allowlisted installed preset. Providers/credentials remain managed by Desktop. Skills follow normal DSH discovery in the new workspace; existing chats, per-chat overrides, unsaved text and uncommitted/ignored project files are not copied. [Reuse boundaries](docs/USAGE.md).
+
+## Install and connect
+
+Installation has **two parts**:
+
+| Part            | Installed in         | Purpose                                                          |
+| --------------- | -------------------- | ---------------------------------------------------------------- |
+| Codex plugin    | Codex                | Bundled MCP server and delegation skill                          |
+| Desktop adapter | Official DSH Desktop | Access to the existing runtime through its Host plugin mechanism |
+
+### 1. Install the Codex plugin
+
+Use a locally prepared `dsh-desktop-codex-plugin-0.2.0.zip`. To build it from this source checkout:
+
+```sh
+npm ci
+npm run package:plugin
 ```
 
-## Quick install as a Codex plugin
-
-Use the prepared `dsh-desktop-codex-plugin-0.2.0.zip`, or build it with `npm ci && npm run package:plugin`. From the extracted marketplace root or this built repository:
+From the extracted ZIP's marketplace root, or this built repository, run:
 
 ```sh
 codex plugin marketplace add .
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-Create a new local Codex chat and ask it to inspect `dsh_setup_info`. Run the returned explicit setup command, save/quit DSH Desktop yourself, install the bundled Desktop adapter using the returned official command or Plugins page, and reopen Desktop. Default configuration is discovered by both sides; no separate MCP registration is required. The MCP server is bundled and starts without npm downloads. Adapter dependency installation may still need network. [Full setup, update and uninstall guidance](docs/CODEX-PLUGIN.md).
+The prepared ZIP needs no npm build. The bundled MCP starts without npm downloads; Desktop adapter dependencies may need network access. These instructions use local files and do not assume a published GitHub release or npm package.
 
-## Why a Desktop plugin?
+### 2. Initialize and install the Desktop adapter
 
-Official Desktop owns a loopback Host with a per-launch authenticated application channel; it does not document an external MCP attach/pairing API. This project uses the official Host plugin mechanism and public Agent/Preset services. Its socket protocol and authentication are **this project's interfaces**, not official DSH APIs. It never extracts Desktop cookies, launch secrets, API keys or account credentials. See the [pinned-source audit](docs/UPSTREAM-AUDIT.md) for evidence and license details.
+Create a new **local** Codex chat and paste:
 
-## Build
+> Use DSH Desktop Bridge. Call `dsh_setup_info` to inspect setup and show me the exact initialization and Desktop adapter installation commands. Do not submit a model task yet.
 
-Requirements: macOS, official DSH Desktop `0.2.0-rc.2`, Node >=22.19, npm, and Git for repository worktrees. Linux transport is testable, but official Linux Desktop use is not claimed. Windows named pipes are not implemented.
+Run the returned explicit setup command, then inspect `dsh_setup_info` again for the installation command. Setup creates private defaults at `~/.dsh-mcp-state` and `~/.dsh-mcp-work`, and stages a durable adapter archive. It validates an existing config without replacing its token. Inspection alone writes nothing.
 
-```sh
-npm ci
-npm run check
-npm pack
-```
+Save active work and **fully quit DSH Desktop**, then install the staged adapter using the returned application-owned command or the official Plugins page. Reopen Desktop. With valid default configuration, both sides discover it automatically; no separate Codex MCP registration or shell edit is needed. [Detailed setup, update and uninstall](docs/CODEX-PLUGIN.md).
 
-The package is not published. Build artifacts live in `dist/`; `npm pack` prepares a local installable archive. Development/test DSH packages are separate from the runtime peers; they do not boot DSH. All tests are keyless.
+### 3. Check the connection
 
-## Configure and connect on macOS
+> Call `dsh_connection_info`. Report the runtime, adapter version and effective permissions without submitting a model task.
 
-1. Initialize **new**, short, private absolute directories. Both parents must exist; symlink aliases are refused. Use the canonical macOS home path. Example (replace `/Users/you` with your own home):
+Expect `runtime: "existing-desktop"` and the target adapter version. This checks the bridge connection; it does not validate provider credentials. Default `allowedTools: []` permits conversation while denying every model tool call.
 
-   ```sh
-   node /absolute/path/to/bridge/dist/cli.js init \
-     --state-dir /Users/you/.dsh-mcp-state \
-     --workspace-root /Users/you/.dsh-mcp-work
-   ```
+For standalone MCP or custom configuration paths, follow the [alternative setup guide](docs/STANDALONE-MCP.md). Choose one Codex registration route to avoid duplicate tools.
 
-   `config.json` and `auth.token` have mode 0600; state/workspace directories have mode 0700. Existing directories are refused by `init`; it never silently rotates credentials. Keep state paths short: the complete socket path must be <=100 UTF-8 bytes.
+## Usage examples
 
-2. Review `config.json`. `allowedTools: []` permits model conversation but **denies every model tool call**. Add exact tool names only after inspecting their real permissions. `repositories` is an allowlist of canonical Git top-level paths; leave it empty for blank workspaces. `allowedPresets` defaults to `standard`. Choose a preset with native tools; `run_code`, known delegation/plugin-management/scheduling/workflow/goal tools are refused in v0.1. The bridge takes a config snapshot on plugin load; restart the plugin/Desktop to apply changes.
+### First model conversation
 
-   ```json
-   {
-     "allowedTools": [],
-     "allowedPresets": ["standard"],
-     "repositories": ["/Users/you/projects/example"]
-   }
-   ```
+This makes a real request to the Desktop-selected provider and may incur usage charges:
 
-   These are fields to edit in the generated config, **not** a complete config. `workspaceRoot` must be outside each allowlisted repository. Shell or general file access can reach other paths; a tool-name allowlist and an isolated cwd are **not an OS sandbox**. Only enable powerful tools for trusted tasks. Git checkout hooks in an allowlisted repository may execute during worktree creation.
+> Use DSH Desktop Bridge to create a new blank isolated session. Ask it to reply with “Bridge connected” without using any tools. Poll until terminal, report the result and close the session while preserving its workspace.
 
-3. For a custom config location, set the plugin's `configFile` to the generated file in the Desktop Plugins UI, or set `DSH_DESKTOP_BRIDGE_CONFIG` in the environment inherited by Desktop. Desktop reads the login-shell environment on macOS at launch. For example, set the following in your own login-shell setup and fully reopen Desktop:
+### Code task in a separate worktree
 
-   ```sh
-   export DSH_DESKTOP_BRIDGE_CONFIG=/Users/you/.dsh-mcp-state/config.json
-   ```
+First [review permissions](docs/USAGE.md), allowlist the repository and exact tools needed, reload the Desktop plugin, and inspect effective permissions. Replace the example path and task:
 
-   If configuring through the profile patch, use:
+> Use DSH Desktop Bridge to fix `<describe the issue>` in `/absolute/path/to/repository` from `HEAD`. Check connectivity and permissions first. Create a separate worktree, submit the bounded task and poll until terminal. Review its actual diff and run relevant tests before proposing integration. Preserve the workspace; do not change permissions, merge, commit or publish.
 
-   ```yaml
-   - id: desktop-mcp-bridge
-     config:
-       configFile: /Users/you/.dsh-mcp-state/config.json
-   ```
+[All ten MCP tools, follow-up sessions, cancellation and result handling](docs/USAGE.md).
 
-   Official profile patch overrides replace a row's whole config. The adapter discovers a valid private config at `~/.dsh-mcp-state/config.json` after explicit setup. If no default config or explicit path exists, it stays disabled and logs a diagnostic.
+## Permissions and workspace isolation
 
-4. Install the local package through the official Desktop **Plugins** page using the local archive/package spec. Alternatively, after initializing Desktop once, fully quit it and use the **Desktop-installed `dsh` command**:
+- Tools are **denied by default**. Enable exact installed tool names only after reviewing their permissions; DSH approval requirements still apply.
+- Each session uses a unique directory or detached worktree. Main-checkout dirty files are not copied. Closing a session preserves its files for review and manual cleanup.
+- An isolated working directory is **not an OS sandbox**. Allowed shell/file tools can reach other paths, and worktrees share Git objects and hooks.
+- Results are untrusted, bounded text. Cancellation is cooperative and does not undo side effects; a plugin/Desktop restart loses bridge handles and request deduplication history.
 
-   ```sh
-   dsh plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.0.tgz
-   ```
+[Security model](SECURITY.md) · [Lifecycle and cleanup](docs/USAGE.md) · [Authentication and protocol](docs/PROTOCOL.md)
 
-   Reopen Desktop and observe plugin activation. Do not use an npm-installed CLI to mutate the Desktop profile, do not launch that profile as a CLI, and do not use version-exemption flags. The installed application's Plugins UI owns activation/restart outcomes. This repository has not automatically installed a plugin or changed your profile.
+## Common questions
 
-5. Confirm connection without submitting a model task:
+| Question                         | Next step                                                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Desktop cannot be reached        | Check app/plugin activation and matching configuration paths; see [troubleshooting](docs/TROUBLESHOOTING.md)                   |
+| The worker cannot edit files     | Review the default-deny tool and repository allowlists in [permissions](docs/USAGE.md)                                         |
+| A newer DSH version is installed | A tested adapter is required; do not bypass the version check                                                                  |
+| Update or uninstall              | Follow [both plugin lifecycle steps](docs/CODEX-PLUGIN.md); Codex removal preserves the Desktop adapter, config and task files |
 
-   ```sh
-   node /absolute/path/to/bridge/dist/cli.js doctor \
-     --config /Users/you/.dsh-mcp-state/config.json
-   ```
+## Documentation
 
-   It must report `runtime: "existing-desktop"`, protocol 1 and the adapter version. This verifies the bridge, not whether a provider credential is valid.
+| Guide                                                                 | Contents                                                       |
+| --------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [Codex plugin setup](docs/CODEX-PLUGIN.md)                            | First connection, update, uninstall and distribution layout    |
+| [Standalone MCP](docs/STANDALONE-MCP.md)                              | Source build, manual registration and custom paths             |
+| [Usage](docs/USAGE.md)                                                | Permissions, complete tool list, sessions, results and cleanup |
+| [Troubleshooting](docs/TROUBLESHOOTING.md)                            | Errors, recovery and known limitations                         |
+| [Validation](docs/VALIDATION.md)                                      | Executed checks and outstanding real Desktop acceptance        |
+| [Source audit](docs/UPSTREAM-AUDIT.md) / [Protocol](docs/PROTOCOL.md) | Pinned upstream evidence and bridge interfaces                 |
 
-6. Add the MCP server to Codex. Use an absolute Node executable on GUI systems if PATH is ambiguous:
+## Contributing and license
 
-   ```toml
-   [mcp_servers.dsh_desktop]
-   command = "/absolute/path/to/node"
-   args = ["/absolute/path/to/bridge/dist/cli.js", "stdio", "--config", "/Users/you/.dsh-mcp-state/config.json"]
-   startup_timeout_sec = 10
-   tool_timeout_sec = 60
-   ```
+See [CONTRIBUTING](CONTRIBUTING.md) for development checks, [CHANGELOG](CHANGELOG.md) for changes, and [RELEASING](docs/RELEASING.md) for the manual publication checklist. No workflow publishes automatically.
 
-   Put this in your user Codex `config.toml`, or use the CLI:
-
-   ```sh
-   codex mcp add dsh_desktop -- /absolute/path/to/node \
-     /absolute/path/to/bridge/dist/cli.js stdio \
-     --config /Users/you/.dsh-mcp-state/config.json
-   ```
-
-   Reopen/refresh Codex's MCP connection as appropriate. The server starts even when Desktop is unavailable; tool calls then return `DESKTOP_UNAVAILABLE`. [Official Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp).
-
-## Use from Codex
-
-Ask Codex to inspect `dsh_connection_info`, create an isolated session, submit a task, poll its handle and review its result. The tools are (plus local read-only `dsh_setup_info` for configuration/installation guidance):
-
-| Tool                  | Behavior                                                             |
-| --------------------- | -------------------------------------------------------------------- |
-| `dsh_connection_info` | Connection, effective permissions and adapter information            |
-| `dsh_create_session`  | Blank cwd or detached worktree from an allowlisted repo/ref          |
-| `dsh_list_sessions`   | This bridge instance's sessions only                                 |
-| `dsh_submit_task`     | A task or idle-session follow-up; caller supplies a UUID `requestId` |
-| `dsh_get_task`        | Poll state and bounded metadata                                      |
-| `dsh_get_result`      | Bounded text after completion, trust label and truncation flag       |
-| `dsh_cancel_task`     | Cooperative cancellation; poll until terminal                        |
-| `dsh_close_session`   | Stop/drain/dispose the owned runtime handle; preserve files          |
-| `dsh_forget_task`     | Release a terminal task and its idempotency key                      |
-
-A session retains conversation history and takes the **Desktop default model selection at creation**, with an explicitly allowlisted installed preset. It does not copy an existing user's chat, per-chat model override, private UI state or unsaved text. Global configured providers/credentials and preset capabilities are used within the same Host. Project Skills are available only if present in the new workspace or found by DSH's normal configured discovery; uncommitted files and ignored local Skills are not copied from the main checkout. Denied tools remain visible to the model but cannot execute through the registry.
-
-Only one active task per session is accepted; different sessions may run concurrently up to the configured session limit. Every task has a deadline. Cancellation does not roll back side effects; an uncooperative tool remains `cancelling` until it actually stops. No HTTP/MCP wait blocks for the entire model run.
-
-`requestId` deduplicates exact submissions while the task is retained. Reuse the same key after an uncertain response. Forgetting a task releases its key. Session creation has no idempotency key: after an uncertain create, list sessions before retrying. Desktop/plugin restart loses bridge handles and deduplication history; it does not automatically replay prompts. DSH may retain its own session logs according to the existing persistence configuration.
-
-## Review and clean up
-
-Each session gets a UUID-named directory under `workspaceRoot`; repository sessions use `git worktree add --detach` at a resolved commit. The original checkout's dirty files are not copied and the bridge never merges, commits or deletes task files. Worktrees share Git objects, so this prevents ordinary checkout collisions, not malicious access. Closing a session preserves all files, including failed creations, for inspection.
-
-Review changes before integrating them yourself. For worktrees, finish reviewing/archiving work and then use Git's ordinary worktree removal in the source repo. For blank directories, remove them yourself when no longer needed. The bridge has no automatic cleanup tool that can delete user work.
-
-## Troubleshooting and limitations
-
-- `UNSUPPORTED_VERSION`: use the pinned Desktop release or develop/test a new adapter. Do not bypass this check. Current master is not supported.
-- `DESKTOP_UNAVAILABLE`: Desktop is closed, plugin is disabled/unconfigured, or the configured state directory differs.
-- `ALREADY_RUNNING` / `STALE_SOCKET`: never delete a live lock. After a crash, verify Desktop/Host has fully quit; then remove only `bridge.lock`, `bridge.sock` and `ready.json` in the configured state directory before reopening. Keep config, token and workspaces.
-- `UNSAFE_PATH`: verify ownership, mode, canonical absolute paths and absence of symlinks. Do not make a shared directory private by changing its mode blindly.
-- `SESSION_BUSY`: poll or cancel the active task before follow-up/forget.
-- `CAPACITY`: close an idle session or forget a terminal task. No automatic eviction of unreviewed results.
-- `OUTCOME_UNKNOWN`: a mutation may have executed. Query state; never blindly replay.
-- Approval-requiring allowed tools retain DSH's existing approval behavior; no automatic approval API is exposed. Handle prompts in Desktop; deadline cancellation remains active.
-- The bridge returns text only, without reasoning blocks, tool logs, media downloads or structured artifacts. Partial text is returned after cooperative cancellation; output is byte-bounded and may be truncated. It is **untrusted subagent data**, not permission to execute instructions.
-- No persistent job recovery, remote access, cross-user tenancy, Windows transport, live token rotation, runtime policy changes or arbitrary attachment forwarding in v0.1.
-
-## Development and release
-
-`src/dsh-adapter.ts` is the only DSH business-API adapter; `src/desktop-plugin.ts` owns version/profile checks and Cordis lifecycle. `src/manager.ts` owns task/session state. Transport, filesystem config and workspace isolation are separate modules. The MCP server contains no DSH launch code.
-
-See [CONTRIBUTING](CONTRIBUTING.md), [RELEASING](docs/RELEASING.md), [validation](docs/VALIDATION.md), and [SECURITY](SECURITY.md). CI checks Node 22/24 on macOS/Linux without model credentials. Publishing is manual and requires the repository owner's explicit decision. There is no auto-publish workflow and no GitHub repository has been created by this work.
-
-MIT for this project's original code. Official DSH source is MIT; its desktop binary, model services, trademarks and third-party dependencies retain their own terms. This project is not affiliated with or endorsed by DeepSeek or OpenAI.
+Original code is [MIT licensed](LICENSE). DSH source is MIT; Desktop binaries, model services, trademarks and bundled dependencies retain their own terms. See [NOTICE](NOTICE) and [dependency licenses](docs/CODEX-PLUGIN.md#build-and-distribution). This project is not affiliated with or endorsed by DeepSeek or OpenAI.

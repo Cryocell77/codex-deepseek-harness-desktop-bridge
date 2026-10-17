@@ -1,6 +1,8 @@
 # DSH Desktop Bridge — Codex 插件
 
-本插件包含可离线启动的 MCP 服务、委派 Skill 与 DSH Desktop 适配器。需要 Node >=22.19，以及官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
+[English](README.md)
+
+安装分为两部分：Codex 插件包含可离线启动的 MCP 服务与委派 Skill；随包 DSH Desktop 适配器需要另行安装到官方桌面端。需要 Node >=22.19，以及官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
 
 ## 在 Codex 安装
 
@@ -21,7 +23,7 @@ codex plugin add dsh-desktop@dsh-desktop-bridge
 
 插件的 `dsh_setup_info` 返回已安装副本的准确路径及初始化/安装命令。按照返回值运行显式 `setup` 命令，会创建 `~/.dsh-mcp-state` 和 `~/.dsh-mcp-work`，默认拒绝所有工具；已有配置会被验证，token 不会被替换。初始化还将桌面适配器归档复制到状态目录的 `adapters/` 中，供 DSH 持久引用；Codex 更新或卸载不会删除这个副本。仅检查状态不会创建文件。
 
-保存当前桌面任务并**自行完全退出 DSH Desktop**，再通过官方 Plugins 页面安装 `desktop/` 下的适配器，或运行状态工具返回的 Desktop 自带命令。适配器需要联网安装其 npm 依赖；MCP 启动本身不需要网络。重新打开 Desktop 后，再调用 `dsh_connection_info` 确认连通。
+初始化后再次调用 `dsh_setup_info`，获取指向持久归档副本的 `desktopInstall`。保存当前桌面任务并**自行完全退出 DSH Desktop**，再通过官方 Plugins 页面安装该副本，或运行返回的 Desktop 自带命令。返回路径假定应用位于 `/Applications/DeepSeek Harness.app`；如安装位置不同，请调整为该应用自带的实际路径。适配器可能需要联网安装其 npm 依赖；MCP 启动本身不需要网络。重新打开 Desktop 后，再调用 `dsh_connection_info` 确认返回 `runtime: "existing-desktop"`。连接检查不调用模型，也不验证模型凭据；之后的真实模型任务可能产生费用。
 
 默认路径下有效、私有的配置由双方自动发现，无需编辑 Codex MCP 配置或 shell 启动文件。自定义配置继续支持独立 CLI 的 `--config`；若要为插件使用自定义路径，请在 Codex 插件 MCP 的本地覆盖配置中传入该参数，并同步设置 Desktop 插件的 `configFile`。不要依赖 Codex 自动转发任意环境变量。
 
