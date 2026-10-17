@@ -4,3 +4,6 @@ package-lock.json
 *.tgz
 work/
 outputs/
+plugins/dsh-desktop/runtime/
+plugins/dsh-desktop/desktop/
+plugins/dsh-desktop/THIRD_PARTY_NOTICES.txt

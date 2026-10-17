@@ -4,7 +4,7 @@
 
 An **unofficial, opt-in** TypeScript bridge that lets Codex Desktop/CLI delegate to the **already running official DeepSeek Harness Desktop**. It does not launch `dsh`, a CLI agent, a Web server, or another Harness runtime. The only additional process launched by Codex is the MCP stdio server.
 
-**Status: experimental v0.1.** The adapter targets official **DSH `0.2.0-rc.2`**, the locally observed macOS release. Other DSH core versions fail closed. Official master was `0.2.1-rc.1` at audit time; this is **not** a claim of compatibility with master or future Desktop releases. Real macOS Desktop plugin activation and paid/live model execution still need a user-run acceptance test. See [validation](docs/VALIDATION.md).
+**Status: experimental v0.2.0.** The adapter targets official **DSH `0.2.0-rc.2`**, the locally observed macOS release. Other DSH core versions fail closed. Official master was `0.2.1-rc.1` at audit time; this is **not** a claim of compatibility with master or future Desktop releases. Real macOS Desktop plugin activation and paid/live model execution still need a user-run acceptance test. See [validation](docs/VALIDATION.md).
 
 ```text
 Codex Desktop / CLI
@@ -15,6 +15,17 @@ Codex Desktop / CLI
                       └─ configured model, preset, Skills and allowed Tools
                            └─ separate session + separate workspace/worktree
 ```
+
+## Quick install as a Codex plugin
+
+Use the prepared `dsh-desktop-codex-plugin-0.2.0.zip`, or build it with `npm ci && npm run package:plugin`. From the extracted marketplace root or this built repository:
+
+```sh
+codex plugin marketplace add .
+codex plugin add dsh-desktop@dsh-desktop-bridge
+```
+
+Create a new local Codex chat and ask it to inspect `dsh_setup_info`. Run the returned explicit setup command, save/quit DSH Desktop yourself, install the bundled Desktop adapter using the returned official command or Plugins page, and reopen Desktop. Default configuration is discovered by both sides; no separate MCP registration is required. The MCP server is bundled and starts without npm downloads. Adapter dependency installation may still need network. [Full setup, update and uninstall guidance](docs/CODEX-PLUGIN.md).
 
 ## Why a Desktop plugin?
 
@@ -56,7 +67,7 @@ The package is not published. Build artifacts live in `dist/`; `npm pack` prepar
 
    These are fields to edit in the generated config, **not** a complete config. `workspaceRoot` must be outside each allowlisted repository. Shell or general file access can reach other paths; a tool-name allowlist and an isolated cwd are **not an OS sandbox**. Only enable powerful tools for trusted tasks. Git checkout hooks in an allowlisted repository may execute during worktree creation.
 
-3. Set the plugin's `configFile` to the generated file in the Desktop Plugins UI, or set `DSH_DESKTOP_BRIDGE_CONFIG` in the environment inherited by Desktop. Desktop reads the login-shell environment on macOS at launch. For example, set the following in your own login-shell setup and fully reopen Desktop:
+3. For a custom config location, set the plugin's `configFile` to the generated file in the Desktop Plugins UI, or set `DSH_DESKTOP_BRIDGE_CONFIG` in the environment inherited by Desktop. Desktop reads the login-shell environment on macOS at launch. For example, set the following in your own login-shell setup and fully reopen Desktop:
 
    ```sh
    export DSH_DESKTOP_BRIDGE_CONFIG=/Users/you/.dsh-mcp-state/config.json
@@ -70,12 +81,12 @@ The package is not published. Build artifacts live in `dist/`; `npm pack` prepar
        configFile: /Users/you/.dsh-mcp-state/config.json
    ```
 
-   Official profile patch overrides replace a row's whole config. A plugin installed without an explicit config stays disabled and logs a local diagnostic.
+   Official profile patch overrides replace a row's whole config. The adapter discovers a valid private config at `~/.dsh-mcp-state/config.json` after explicit setup. If no default config or explicit path exists, it stays disabled and logs a diagnostic.
 
 4. Install the local package through the official Desktop **Plugins** page using the local archive/package spec. Alternatively, after initializing Desktop once, fully quit it and use the **Desktop-installed `dsh` command**:
 
    ```sh
-   dsh plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.1.0.tgz
+   dsh plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.0.tgz
    ```
 
    Reopen Desktop and observe plugin activation. Do not use an npm-installed CLI to mutate the Desktop profile, do not launch that profile as a CLI, and do not use version-exemption flags. The installed application's Plugins UI owns activation/restart outcomes. This repository has not automatically installed a plugin or changed your profile.
@@ -111,7 +122,7 @@ The package is not published. Build artifacts live in `dist/`; `npm pack` prepar
 
 ## Use from Codex
 
-Ask Codex to inspect `dsh_connection_info`, create an isolated session, submit a task, poll its handle and review its result. The tools are:
+Ask Codex to inspect `dsh_connection_info`, create an isolated session, submit a task, poll its handle and review its result. The tools are (plus local read-only `dsh_setup_info` for configuration/installation guidance):
 
 | Tool                  | Behavior                                                             |
 | --------------------- | -------------------------------------------------------------------- |

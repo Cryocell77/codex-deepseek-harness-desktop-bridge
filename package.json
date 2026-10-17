@@ -1,6 +1,6 @@
 {
   "name": "dsh-desktop-mcp-bridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Unofficial, opt-in MCP bridge to an existing official DeepSeek Harness Desktop runtime",
   "type": "module",
   "license": "MIT",
@@ -38,8 +38,10 @@
     "test": "tsx --test tests/*.test.ts",
     "check": "npm run typecheck && npm run build && npm test",
     "prepack": "npm run build",
-    "format:check": "prettier --check src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown",
-    "format": "prettier --write src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown"
+    "format:check": "prettier --check src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown .agents plugins --ignore-path .prettierignore",
+    "format": "prettier --write src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown .agents plugins --ignore-path .prettierignore",
+    "package:plugin": "npm run build && node scripts/package-plugin.mjs",
+    "verify:plugin": "node scripts/verify-plugin.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
@@ -75,12 +77,13 @@
     "@deepseek-ai/dsh-session-projection": "0.2.0-rc.2",
     "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2",
     "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "3.18.4",
     "@types/node": "^22.19.0",
     "esbuild": "0.28.1",
+    "fflate": "0.8.3",
     "prettier": "3.8.3",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3",
-    "@deepseek-ai/schemastery": "3.18.4"
+    "typescript": "^5.9.3"
   },
   "overrides": {
     "@deepseek-ai/cordis-plugin-logger-console": "1.0.4",

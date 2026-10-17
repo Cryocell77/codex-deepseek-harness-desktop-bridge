@@ -1,5 +1,22 @@
 # Validation record / 验证记录
 
+## v0.2.0 plugin packaging
+
+The v0.1.0 baseline is preserved at local commit `222d2c5` with annotated tag `v0.1.0`. The following v0.2.0 changes were made after that commit and have not been pushed.
+
+- Strict typecheck/build and **23 tests passed, 0 failed, 0 skipped**. Added read-only setup/no-file-creation checks, repeat setup/token preservation, incomplete setup refusal, and relocated self-contained plugin startup with setup completed after MCP initialization. The adapter archive is staged in private persistent state and remains available after its original cached copy is removed.
+- Portable `plugin.json` and `mcp.json` passed the official Agent Plugins 1.0.0 JSON schemas; the packaged Skill passed Skill Creator validation.
+- The installed Codex CLI `0.163.0-alpha.10.2` discovered `dsh-desktop@dsh-desktop-bridge`, version `0.2.0`, through a read-only local-marketplace listing with temporary inline configuration overrides. The plugin was not installed into the user profile by this check.
+- The MCP launcher uses a bundled CommonJS server and works after copying the plugin to a directory with spaces and no node_modules. It lists 10 tools even when configuration is missing and reconnects after explicit setup without restarting MCP.
+- The extracted release ZIP was separately unpacked to a path with spaces: real Codex CLI discovery and SDK MCP initialization succeeded with 10 tools, no node_modules, no installation and no model calls. Its Desktop archive version and license/security resources were inspected.
+- The installed Electron Node runtime again passed all 6 official-service adapter tests after the v0.2.0 changes.
+- `npm run format:check` and `npm run verify:plugin` passed; dependency audit reported 0 vulnerabilities.
+- `npm run package:plugin` prepared a local marketplace ZIP, Desktop npm archive, complete source ZIP and SHA-256 checksums. It includes bundled third-party license notices and excludes private state/dependencies/research scratch directories.
+
+Actual Codex UI installation and signed DSH Desktop adapter activation/live-provider acceptance are still unverified. The existing core-adapter limitations apply. No public directory submission, npm publication, GitHub push or application/profile mutation occurred.
+
+## v0.1.0 baseline validation
+
 Date: **2026-10-17 (Asia/Hong_Kong)**. Local platform: macOS arm64. Development runtime: Node **24.21.0**, npm **11.19.0**. Installed official Desktop: **0.2.0-rc.2**, bundled Electron **44.0.0** / Node **24.18.1**. Its targeted ASAR package manifests confirm Cordis **4.0.4** and six checked DSH core packages at **0.2.0-rc.2**; no credentials were read.
 
 ## Executed successfully

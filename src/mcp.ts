@@ -4,6 +4,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { operations, type Operation } from './protocol.ts';
 import { BridgeClient } from './transport.ts';
 import { publicError } from './errors.ts';
+import { setupInfo } from './setup.ts';
+import { BRIDGE_VERSION } from './version.ts';
 const descriptions: Record<Operation, string> = {
   connection_info:
     'Inspect connection, adapter version and local permissions of an existing DSH Desktop bridge. Never launches DSH.',
@@ -23,9 +25,21 @@ const descriptions: Record<Operation, string> = {
   forget_task:
     'Forget a terminal task and release its requestId. Retries using this requestId can now create new work.',
 };
-export async function serveMcp(configFile: string): Promise<McpServer> {
-  const client = await BridgeClient.fromConfig(configFile);
-  const server = new McpServer({ name: 'dsh-desktop-mcp-bridge', version: '0.1.0' });
+export async function serveMcp(configFile: string, pluginRoot?: string): Promise<McpServer> {
+  let client: BridgeClient | undefined;
+  const server = new McpServer({ name: 'dsh-desktop-mcp-bridge', version: BRIDGE_VERSION });
+  server.registerTool(
+    'dsh_setup_info',
+    {
+      description:
+        'Read-only local setup status and explicit adapter installation instructions. Does not initialize files, install anything or launch DSH.',
+      inputSchema: {},
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    async (): Promise<CallToolResult> => ({
+      content: [{ type: 'text', text: JSON.stringify(await setupInfo(configFile, pluginRoot)) }],
+    }),
+  );
   for (const [operation, schema] of Object.entries(operations)) {
     const op = operation as Operation;
     server.registerTool(
@@ -49,6 +63,7 @@ export async function serveMcp(configFile: string): Promise<McpServer> {
       },
       async (params: unknown): Promise<CallToolResult> => {
         try {
+          client ??= await BridgeClient.fromConfig(configFile);
           const result = await client.call(op, params);
           return { content: [{ type: 'text', text: JSON.stringify(result) }] };
         } catch (error) {

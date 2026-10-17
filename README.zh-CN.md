@@ -4,7 +4,18 @@
 
 一套**非官方、主动启用**的 TypeScript MCP Bridge，让 Codex Desktop/CLI 把任务委派给**已经运行的官方 DeepSeek Harness Desktop**。桥接不会启动 `dsh`、独立 CLI Agent、Web 实例或另一套 Harness Runtime；Codex 仅启动 MCP stdio 服务进程。
 
-**状态：实验性 v0.1。** 适配器针对本机已安装的 macOS 官方 **`0.2.0-rc.2`**。审查时官方主分支已经是 `0.2.1-rc.1`，不能因此声称兼容新版本。其他核心版本会被明确拒绝。已准备自动化测试；**尚未在用户的真实 Desktop 中安装激活插件，也未执行付费/真实模型任务**。实际测试结果见[验证记录](docs/VALIDATION.md)。
+**状态：实验性 v0.2.0。** 适配器针对本机已安装的 macOS 官方 **`0.2.0-rc.2`**。审查时官方主分支已经是 `0.2.1-rc.1`，不能因此声称兼容新版本。其他核心版本会被明确拒绝。已准备自动化测试；**尚未在用户的真实 Desktop 中安装激活插件，也未执行付费/真实模型任务**。实际测试结果见[验证记录](docs/VALIDATION.md)。
+
+## 推荐：安装 Codex 插件
+
+解压 `dsh-desktop-codex-plugin-0.2.0.zip`，在解压后的市场根目录执行；源码仓库需先运行 `npm ci && npm run package:plugin`：
+
+```sh
+codex plugin marketplace add .
+codex plugin add dsh-desktop@dsh-desktop-bridge
+```
+
+新建本地 Codex 聊天，要求先调用 `dsh_setup_info`。按照它返回的精确路径运行显式初始化命令；保存工作、自行退出 DSH Desktop 后，安装随包附带的桌面适配器并重新打开 Desktop。默认配置由双方自动发现，不再需要单独注册 MCP 或修改 shell。MCP 服务随插件打包，启动时无需下载 npm 包；桌面适配器的依赖安装仍可能需要网络。[完整说明](docs/CODEX-PLUGIN.md)。
 
 ## 连接机制与边界
 
@@ -61,7 +72,7 @@ node /absolute/path/to/bridge/dist/cli.js init \
 
 ### 3. 配置 Desktop 插件
 
-在 Desktop 的 Plugins 设置里把插件的 `configFile` 设为生成的完整路径；或者在 Desktop 会继承的登录 shell 环境中设置：
+默认初始化路径会被桌面适配器自动发现。若使用自定义路径，在 Desktop 的 Plugins 设置里把插件的 `configFile` 设为生成的完整路径；或者在 Desktop 会继承的登录 shell 环境中设置：
 
 ```sh
 export DSH_DESKTOP_BRIDGE_CONFIG=/Users/you/.dsh-mcp-state/config.json
@@ -75,14 +86,14 @@ macOS Desktop 在应用启动时读取登录 shell 环境，因此之后需完�
     configFile: /Users/you/.dsh-mcp-state/config.json
 ```
 
-官方 patch 对匹配行的整个 config 做替换。未提供明确配置路径时，插件保持关闭并输出本地诊断。
+官方 patch 对匹配行的整个 config 做替换。若默认配置不存在且未提供明确路径，插件保持关闭并输出本地诊断。
 
 ### 4. 安装到官方 Desktop
 
 通过官方 Desktop 的 **Plugins** 页面安装本地归档/包路径。也可以先打开 Desktop 初始化一次 Profile，再**完全退出**，使用 **Desktop 自带的 `dsh` 命令**：
 
 ```sh
-dsh plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.1.0.tgz
+dsh plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.0.tgz
 ```
 
 重新打开 Desktop 并确认插件真实激活。不要用 npm 单独安装的 CLI 修改 Desktop Profile，也不要通过 CLI 启动该 Profile；不要用版本豁免绕过兼容性检查。官方插件管理器决定激活/重启状态。本项目没有自动修改你的 Desktop 配置。
@@ -119,6 +130,8 @@ codex mcp add dsh_desktop -- /absolute/path/to/node \
 按当前 Codex 界面刷新/重连 MCP。桌面端未开启时，MCP 服务仍可启动，但工具调用会返回 `DESKTOP_UNAVAILABLE`。[官方 Codex MCP 文档](https://learn.chatgpt.com/docs/extend/mcp)。
 
 ## 使用流程
+
+还提供只读的 `dsh_setup_info`，用于查询本地配置和准确的首次安装命令。
 
 1. `dsh_connection_info` 检查连接与有效权限。
 2. `dsh_create_session` 创建独立空目录，或从白名单仓库的指定 commit/ref 创建独立 detached worktree。

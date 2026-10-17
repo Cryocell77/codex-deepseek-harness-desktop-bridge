@@ -27,7 +27,7 @@ MCP uses the official TypeScript SDK's stdio transport. The private Desktop chan
 { "ok": false, "error": { "code": "SESSION_BUSY", "message": "..." } }
 ```
 
-MCP names prefix operations with `dsh_`. The shared Zod schemas in `src/protocol.ts` are authoritative, reject unknown fields, and require UUIDs for bridge handles. DSH runtime session IDs are opaque and never accepted as authority to control arbitrary existing sessions. All local clients possessing the same token share one bridge instance and its owned-session roster.
+MCP names prefix operations with `dsh_`. The separate local `dsh_setup_info` tool reads configuration status and installation instructions without making a Desktop RPC or writing files. The shared Zod schemas in `src/protocol.ts` are authoritative, reject unknown fields, and require UUIDs for bridge handles. DSH runtime session IDs are opaque and never accepted as authority to control arbitrary existing sessions. All local clients possessing the same token share one bridge instance and its owned-session roster.
 
 | Operation       | Parameters                             | Result                                                |
 | --------------- | -------------------------------------- | ----------------------------------------------------- |

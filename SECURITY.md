@@ -4,7 +4,7 @@ This is an experimental local integration. It assumes the current macOS account,
 
 ## Enforced controls
 
-- Opt-in configuration; plugin never starts an external Harness process.
+- Explicit setup creates private default-deny configuration; a valid default config is subsequently discovered by the installed adapter. Explicit plugin setup also stages a versioned adapter archive in the private state directory; startup and read-only setup inspection create no files, and the plugin never starts an external Harness process.
 - Desktop-profile and exact core package-version checks; no version exemptions.
 - Unix socket only. State directory 0700, socket/token/config 0600, current UID ownership, regular-file/no-final-symlink reads, canonical bridge directory paths.
 - Independent random 256-bit token, constant-time comparison, no browser-origin requests, no Host cookie/key extraction.

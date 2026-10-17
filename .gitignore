@@ -1,5 +1,5 @@
 node_modules/
-dist/
+/dist/
 coverage/
 *.tgz
 .env
@@ -8,3 +8,4 @@ bridge-state/
 .DS_Store
 work/
 outputs/
+!plugins/dsh-desktop/desktop/*.tgz

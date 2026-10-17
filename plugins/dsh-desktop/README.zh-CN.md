@@ -1,0 +1,41 @@
+# DSH Desktop Bridge — Codex 插件
+
+本插件包含可离线启动的 MCP 服务、委派 Skill 与 DSH Desktop 适配器。需要 Node >=22.19，以及官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
+
+## 在 Codex 安装
+
+从本项目的发布准备 ZIP 解压后，在解压目录执行：
+
+```sh
+codex plugin marketplace add .
+codex plugin add dsh-desktop@dsh-desktop-bridge
+```
+
+如果使用源码仓库，请先 `npm ci && npm run package:plugin`，再执行上面的命令。已经打包的 ZIP 不需要 npm。没有公开发布 v0.2.0 前，请使用本地路径安装；不要假设远端仓库已经包含本版本。
+
+## 首次连接
+
+安装后新建本地 Codex 聊天，输入：
+
+> 使用 DSH Desktop Bridge，先检查安装状态并帮助我完成首次连接，暂时不要提交模型任务。
+
+插件的 `dsh_setup_info` 返回已安装副本的准确路径及初始化/安装命令。按照返回值运行显式 `setup` 命令，会创建 `~/.dsh-mcp-state` 和 `~/.dsh-mcp-work`，默认拒绝所有工具；已有配置会被验证，token 不会被替换。初始化还将桌面适配器归档复制到状态目录的 `adapters/` 中，供 DSH 持久引用；Codex 更新或卸载不会删除这个副本。仅检查状态不会创建文件。
+
+保存当前桌面任务并**自行完全退出 DSH Desktop**，再通过官方 Plugins 页面安装 `desktop/` 下的适配器，或运行状态工具返回的 Desktop 自带命令。适配器需要联网安装其 npm 依赖；MCP 启动本身不需要网络。重新打开 Desktop 后，再调用 `dsh_connection_info` 确认连通。
+
+默认路径下有效、私有的配置由双方自动发现，无需编辑 Codex MCP 配置或 shell 启动文件。自定义配置继续支持独立 CLI 的 `--config`；若要为插件使用自定义路径，请在 Codex 插件 MCP 的本地覆盖配置中传入该参数，并同步设置 Desktop 插件的 `configFile`。不要依赖 Codex 自动转发任意环境变量。
+
+## 使用与权限
+
+先检查连接，再创建独立会话，提交任务并轮询结果。默认 `allowedTools: []` 只允许模型对话；代码编辑等能力需要在私有配置中明确允许，并重载 Desktop 插件。独立目录/worktree 用于减少文件冲突，不是操作系统沙箱。子 Agent 结果需要由 Codex 独立审查。
+
+卸载 Codex 插件：
+
+```sh
+codex plugin remove dsh-desktop@dsh-desktop-bridge
+codex plugin marketplace remove dsh-desktop-bridge
+```
+
+这不会删除 DSH 适配器、配置、token 或任务文件。适配器应通过官方 Plugins 页面另行卸载，文件在确认不再使用后自行清理。
+
+本包为实验版；真实 Desktop 安装、界面和实际模型任务仍需验收。MIT；依赖许可证见 THIRD_PARTY_NOTICES.txt；无 DeepSeek/OpenAI 官方背书。

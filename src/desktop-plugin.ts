@@ -8,6 +8,7 @@ import { DshDesktopRuntime } from './dsh-adapter.ts';
 import { TaskManager } from './manager.ts';
 import { startBridge } from './transport.ts';
 import { fail } from './errors.ts';
+import { pathExists, resolveConfigFile } from './setup.ts';
 export const name = 'dsh-desktop-mcp-bridge';
 export const inject = ['agents', 'agentPresets', 'agentDefaultModel', 'tools'];
 export interface Config {
@@ -39,10 +40,11 @@ export async function assertCompatible(ctx: Context): Promise<void> {
   }
 }
 export async function apply(ctx: Context, options: Config = {}): Promise<void> {
-  const file = options.configFile ?? process.env.DSH_DESKTOP_BRIDGE_CONFIG;
-  if (!file) {
+  const explicit = options.configFile ?? (process.env.DSH_DESKTOP_BRIDGE_CONFIG || undefined);
+  const file = resolveConfigFile(explicit);
+  if (!explicit && !(await pathExists(file))) {
     ctx.logger.warn(
-      'Desktop MCP bridge is disabled. Set configFile or DSH_DESKTOP_BRIDGE_CONFIG explicitly.',
+      'Desktop MCP bridge is disabled. Run the explicit setup command or set configFile/DSH_DESKTOP_BRIDGE_CONFIG.',
     );
     return;
   }

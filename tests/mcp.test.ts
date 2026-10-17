@@ -26,7 +26,7 @@ test('built MCP stdio exchanges official protocol with a separate client and exi
   });
   await client.connect(transport);
   const tools = await client.listTools();
-  assert.equal(tools.tools.length, 9);
+  assert.equal(tools.tools.length, 10);
   const call = async (name: string, args: Record<string, unknown>) => {
     const result = await client.callTool({ name, arguments: args });
     assert.equal(result.isError, undefined);
