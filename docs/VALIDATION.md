@@ -28,13 +28,13 @@ The newer dependency tree also passed all 10 adapter tests under the installed a
 
 ## Live Desktop run
 
-Environment: signed macOS DSH Desktop **0.2.1-rc.1**, bridge development build **0.3.0**, `allowedTools: []`. The final v0.2.1 package was checked by the automated suite above; it was not separately installed for this live run.
+Environment: signed macOS DSH Desktop **0.2.1-rc.1**, pre-release bridge build, `allowedTools: []`. The final v0.2.1 package was checked by the automated suite above; it was not separately installed for this live run.
 
 | Check          | Result                                                                                        |
 | -------------- | --------------------------------------------------------------------------------------------- |
 | Installation   | Application-owned plugin installer completed its lockfile check; adapter activated in Desktop |
 | Connection     | `runtime: existing-desktop`, adapter `dsh-v0.2.1-rc.1`                                        |
-| Model response | Isolated session returned `BRIDGE_V030_OK`; durable events recorded a completed turn          |
+| Model response | Isolated session returned the expected response; durable events recorded a completed turn     |
 | Cancellation   | running → cancelling → cancelled; durable `turn/end` reason was `aborted`                     |
 | Tool denial    | Native `read` was denied; the session's `tool/result` recorded `isError: true`                |
 | Cleanup        | Both test sessions closed; workspaces retained                                                |
