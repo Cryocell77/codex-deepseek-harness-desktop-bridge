@@ -6,7 +6,7 @@
 
 The generated configuration defaults to `allowedTools: []`, `allowedPresets: ["standard"]`, and `repositories: []`. Conversation is possible, but every model tool execution is denied and no source repository is allowlisted. A successful connection check does not prove that a model task can run.
 
-Edit the generated private `config.json` only after inspecting the actual installed tools and their permissions. Add exact names to `allowedTools`, canonical Git top-level paths to `repositories`, and installed preset names to `allowedPresets`. There is no universal safe tool list: native tools and their names depend on the installed preset/plugins. `run_code` and known delegation, plugin-management, scheduling, workflow and goal tools remain unsupported in v0.2.0. Denied tools can remain visible to the model but cannot execute through the registry.
+Edit the generated private `config.json` only after inspecting the actual installed tools and their permissions. Add exact names to `allowedTools`, canonical Git top-level paths to `repositories`, and installed preset names to `allowedPresets`. There is no universal safe tool list: native tools and their names depend on the installed preset/plugins. `run_code` and known delegation, plugin-management, scheduling, workflow and goal tools remain unsupported in v0.2.1. Denied tools can remain visible to the model but cannot execute through the registry.
 
 Other configuration controls:
 

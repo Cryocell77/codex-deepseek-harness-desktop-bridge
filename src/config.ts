@@ -106,7 +106,7 @@ export async function loadConfig(path: string): Promise<BridgeConfig> {
   )
     fail(
       'CONFIG',
-      'Composite execution, delegation, runtime mutation and autonomous scheduling tools are unsupported in v0.1.',
+      'Composite execution, delegation, runtime mutation and autonomous scheduling tools are unsupported by this adapter.',
     );
   return c;
 }

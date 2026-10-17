@@ -6,7 +6,7 @@ Use this route if you want only the MCP server, are developing the bridge, or yo
 
 ## Build and prepare the Desktop archive
 
-Requirements: macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**, Node **>=22.19.0**, npm, and Git for worktrees. Later DSH releases fail closed. This is experimental; [actual signed-Desktop acceptance remains unverified](VALIDATION.md).
+Requirements: macOS, official DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**, Node **>=22.19.0**, npm, and Git for worktrees. Later DSH releases fail closed. This is experimental; [basic signed-Desktop acceptance passed; allowed edits/approval remain open](VALIDATION.md).
 
 From the source checkout:
 
@@ -16,7 +16,7 @@ npm run check
 npm pack
 ```
 
-`dist/cli.js` is the standalone MCP entry; `npm pack` produces `dsh-desktop-mcp-bridge-0.2.0.tgz` in the repository root. Keep the built source checkout and its production dependencies available to Codex. All automated model tests use scripted providers without API keys.
+`dist/cli.js` is the standalone MCP entry; `npm pack` produces `dsh-desktop-mcp-bridge-0.2.1.tgz` in the repository root. Keep the built source checkout and its production dependencies available to Codex. All automated model tests use scripted providers without API keys.
 
 ## Configure and connect
 
@@ -32,7 +32,7 @@ Replace every example path with your actual absolute path. The installer below a
 
    `config.json` and `auth.token` have mode 0600; state/workspace directories have mode 0700. Existing directories are refused by `init`; it never silently rotates credentials. Keep state paths short: the complete socket path must be <=100 UTF-8 bytes.
 
-2. Review `config.json`. `allowedTools: []` permits model conversation but **denies every model tool call**. Add exact tool names only after inspecting their real permissions. `repositories` is an allowlist of canonical Git top-level paths; leave it empty for blank workspaces. `allowedPresets` defaults to `standard`. Choose a preset with native tools; `run_code`, known delegation/plugin-management/scheduling/workflow/goal tools are refused in v0.2.0. The bridge takes a config snapshot on plugin load; restart the plugin/Desktop to apply changes.
+2. Review `config.json`. `allowedTools: []` permits model conversation but **denies every model tool call**. Add exact tool names only after inspecting their real permissions. `repositories` is an allowlist of canonical Git top-level paths; leave it empty for blank workspaces. `allowedPresets` defaults to `standard`. Choose a preset with native tools; `run_code`, known delegation/plugin-management/scheduling/workflow/goal tools are refused in v0.2.1. The bridge takes a config snapshot on plugin load; restart the plugin/Desktop to apply changes.
 
    ```json
    {
@@ -63,7 +63,7 @@ Replace every example path with your actual absolute path. The installer below a
 4. Install the local package through the official Desktop **Plugins** page using the local archive/package spec. Alternatively, after initializing Desktop once, fully quit it and use the **Desktop-installed `dsh` command**:
 
    ```sh
-   "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.0.tgz
+   "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.1.tgz
    ```
 
    Reopen Desktop and observe plugin activation. Do not use an npm-installed CLI to mutate the Desktop profile, do not launch that profile as a CLI, and do not use version-exemption flags. The installed application's Plugins UI owns activation/restart outcomes. This repository has not automatically installed a plugin or changed your profile.

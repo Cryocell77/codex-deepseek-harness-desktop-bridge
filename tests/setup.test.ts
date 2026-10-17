@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, realpath, rm, lstat, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { DESKTOP_TARGET, CORDIS_TARGET } from '../src/version.ts';
 import { prepareSetup, setupInfo, resolveConfigFile } from '../src/setup.ts';
 test('read-only setup inspection leaves files absent and reports exact commands without credentials', async (t) => {
   const root = await mkdtemp(join(await realpath(tmpdir()), 'dshsetup-'));
@@ -10,6 +11,8 @@ test('read-only setup inspection leaves files absent and reports exact commands 
   const file = join(root, 's', 'config.json');
   const info = await setupInfo(file, join(root, 'plugin'));
   assert.equal(info.configuration.valid, false);
+  assert.equal(info.desktopTarget, DESKTOP_TARGET);
+  assert.equal(info.cordisTarget, CORDIS_TARGET);
   assert.ok(info.setupCommand);
   assert.equal(info.desktopInstall, null);
   assert.equal(info.configFile, file);

@@ -1,18 +1,35 @@
+<p align="center">
+  <img src="icon.svg" alt="DSH Desktop MCP Bridge" width="80" height="80" />
+</p>
+
 # DSH Desktop MCP Bridge
 
 [English](README.md) · [安装指南](docs/CODEX-PLUGIN.zh-CN.md) · [验证记录](docs/VALIDATION.md) · [安全说明](SECURITY.md)
 
-让 **Codex Desktop / CLI 将任务委派给已经运行的官方 DeepSeek Harness Desktop**，复用其现有模型配置与运行时。每个委派会话使用独立目录或 Git worktree，供 Codex 审查结果。
+**Desktop-to-Desktop：Codex Desktop → 已经运行的官方 DeepSeek Harness Desktop。** 直接复用桌面端现有模型配置与运行时；Codex CLI 也可使用同一桥接。每个委派会话使用独立目录或 Git worktree，供 Codex 审查结果。
 
 这是一套**非官方、主动启用的桥接**。它通过现有 Desktop Host 内的插件与经过认证的本地 Unix socket 通信。Codex 启动 MCP stdio 服务；桥接不会启动另一套 DSH CLI/Web 运行时，也不会提取 Desktop 认证秘密。[架构与官方源码核实](docs/UPSTREAM-AUDIT.md)。
 
+## Desktop-to-Desktop，无需复制 API Key
+
+```text
+Codex Desktop → MCP stdio → 经过认证的本地 Unix socket → 现有 DSH Desktop
+   委派 / 审查                                      模型 / Skills / 获准 Tools
+```
+
+- **复用桌面认证。** DSH Desktop 已登录或已配置可用模型提供方后，桥接无需额外配置 DeepSeek API；无需把 `DEEPSEEK_API_KEY` 填入 Codex、桥接配置、额外 `.env` 或桥接启动命令。
+- **使用正在运行的 Desktop。** 任务执行直接调用现有 Host 的 Agent 服务，无需调用 DSH CLI，也不启动独立 CLI/Web 运行时。首次安装插件仍可能使用 Codex 命令，以及官方 Desktop 的 Plugins 页面或应用自带安装命令。
+- **减少 API_KEY 泄露风险。** 模型凭据继续由 DSH 管理，桥接协议不要求传递模型 API Key；减少密钥在文件和环境变量中的重复配置，可降低意外暴露的机会。桥接自己的私有本地认证 token 与模型凭据相互独立。
+
+DSH 仍会请求其已配置的模型服务。这项设计减少密钥复制，不代表获准工具、提示词或模型输出绝无泄露风险。详见[安全模型](SECURITY.md)。
+
 ## 兼容性与状态
 
-**实验性 v0.2.0。** 自动化集成与打包检查已通过；在真实 macOS 签名桌面应用中安装激活插件、执行真实模型任务**仍未验证**。详见[验证记录与验收步骤](docs/VALIDATION.md)。
+**实验性 v0.2.1。** 自动化检查与真实 macOS 签名桌面应用中的安装激活、模型回复、工具拒绝及取消流程**已通过验证**。获准的文件编辑工具与人工审批界面仍需真实验收。真实检查使用了[验证记录](docs/VALIDATION.md)中说明的未发布开发构建；最终 v0.2.1 归档已通过自动化检查。
 
 | 组件        | 要求 / 已验证范围                                                                           |
 | ----------- | ------------------------------------------------------------------------------------------- |
-| DSH Desktop | 官方 macOS **0.2.0-rc.2**、Cordis **4.0.4**；其他核心版本会被拒绝                           |
+| DSH Desktop | 官方 macOS **0.2.1-rc.1**、Cordis **4.0.5**；其他核心版本会被拒绝                           |
 | Codex       | 支持便携 Agent Plugins 格式的本地 Desktop/CLI；已验证 CLI **0.163.0-alpha.10.2** 可发现插件 |
 | Node.js     | **>=22.19.0**，Codex 能够找到该可执行程序                                                   |
 | Git         | 创建仓库 worktree 时需要                                                                    |
@@ -31,7 +48,14 @@
 
 ### 1. 安装 Codex 插件
 
-使用本地准备好的 `dsh-desktop-codex-plugin-0.2.0.zip`。若从当前源码仓库构建：
+从 GitHub 安装固定版本的插件市场（私有仓库需要你已获授权的 Git 访问权限）：
+
+```sh
+codex plugin marketplace add Cryocell77/codex-deepseek-harness-desktop-bridge --ref v0.2.1
+codex plugin add dsh-desktop@dsh-desktop-bridge
+```
+
+也可以从 [v0.2.1 Release](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/releases/tag/v0.2.1) 下载 `dsh-desktop-codex-plugin-0.2.1.zip`。若从源码仓库构建安装包：
 
 ```sh
 npm ci
@@ -45,7 +69,7 @@ codex plugin marketplace add .
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-已经打包的 ZIP 无需 npm 构建。随包 MCP 启动时不下载 npm 包；Desktop 适配器的依赖安装可能需要网络。此处使用本地文件安装，不假设已有公开的 GitHub Release 或 npm 包。
+已经打包的 ZIP 无需 npm 构建。随包 MCP 启动时不下载 npm 包；Desktop 适配器的依赖安装可能需要网络。ZIP 与 Git 插件市场均包含运行产物，安装不依赖 npm 发布。
 
 ### 2. 初始化并安装 Desktop 适配器
 

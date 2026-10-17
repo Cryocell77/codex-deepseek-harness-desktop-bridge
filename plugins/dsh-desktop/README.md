@@ -1,8 +1,14 @@
+<p align="center">
+  <img src="assets/icon.svg" alt="DSH Desktop MCP Bridge" width="80" height="80" />
+</p>
+
 # DSH Desktop Bridge — Codex plugin
 
 [简体中文](README.zh-CN.md)
 
-Installation has two parts: this Codex plugin contains a self-contained MCP server and delegation skill; the bundled adapter must also be installed separately into official DSH Desktop. Requires Node >=22.19 and official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**. Starting the MCP server downloads nothing and never launches another Harness CLI/Web runtime.
+**Desktop-to-Desktop:** reuse the running DSH Desktop and its configured provider, without another model API key in Codex or bridge configuration. Task execution does not invoke the DSH CLI; installation can still use the application-owned installer. This reduces duplicated API key exposure while keeping DSH provider calls and tool permissions in effect.
+
+Installation has two parts: this Codex plugin contains a self-contained MCP server and delegation skill; the bundled adapter must also be installed separately into official DSH Desktop. Requires Node >=22.19 and official DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**. Starting the MCP server downloads nothing and never launches another Harness CLI/Web runtime.
 
 Extract the prepared marketplace ZIP, then from its root:
 
@@ -11,7 +17,7 @@ codex plugin marketplace add .
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-For a source checkout, first run `npm ci && npm run package:plugin`. The prepared ZIP needs no npm setup. v0.2.0 has not been pushed or published by this work; use local installation until its owner publishes the prepared files.
+For a source checkout, first run `npm ci && npm run package:plugin`. The prepared ZIP needs no npm setup. Release archives are available from the repository releases page; no published npm package is required.
 
 Create a new local Codex chat and ask it to check DSH Desktop Bridge setup without submitting a model task. `dsh_setup_info` returns exact paths in the installed copy. Run its explicit setup command to initialize private `~/.dsh-mcp-state` and `~/.dsh-mcp-work` with tools denied by default; repeat setup validates existing config without rotating the token. Setup also copies the Desktop archive into private state `adapters/` for a durable installation path independent of the Codex cache. Inspection alone creates no files.
 
@@ -26,4 +32,4 @@ codex plugin remove dsh-desktop@dsh-desktop-bridge
 codex plugin marketplace remove dsh-desktop-bridge
 ```
 
-Uninstalling this Codex plugin preserves the Desktop adapter, credentials/config and task files; remove those separately when safe. Experimental: real signed-Desktop installation/UI/live-provider acceptance remains unverified. MIT; bundled dependency licenses are in THIRD_PARTY_NOTICES.txt. No DeepSeek/OpenAI endorsement.
+Uninstalling this Codex plugin preserves the Desktop adapter, credentials/config and task files; remove those separately when safe. Experimental: signed-Desktop connection, live model response, default-deny enforcement and cancellation passed. Allowed editing tools and approval UI still need live acceptance. MIT; bundled dependency licenses are in THIRD_PARTY_NOTICES.txt. No DeepSeek/OpenAI endorsement.

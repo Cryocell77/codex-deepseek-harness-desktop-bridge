@@ -45,6 +45,7 @@ try {
   for (const file of [
     'LICENSE',
     'NOTICE',
+    'icon.svg',
     'README.md',
     'README.zh-CN.md',
     'SECURITY.md',
@@ -70,7 +71,11 @@ try {
     join('outputs', `dsh-desktop-mcp-bridge-source-${pkg.version}.zip`),
     zipSync(source, { level: 9 }),
   );
-  const archives = (await readdir('outputs')).filter((n) => /\.(zip|tgz)$/.test(n)).sort();
+  const archives = [
+    `${prefix}.zip`,
+    `dsh-desktop-mcp-bridge-${pkg.version}.tgz`,
+    `dsh-desktop-mcp-bridge-source-${pkg.version}.zip`,
+  ].sort();
   const checksums = await Promise.all(
     archives.map(
       async (name) =>

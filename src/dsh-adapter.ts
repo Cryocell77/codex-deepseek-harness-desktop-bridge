@@ -29,7 +29,14 @@ export class DshDesktopRuntime implements DesktopRuntime {
       meta: { cwd, agentPreset: resolved.id },
       agentOptions: { ...selection },
       setup: async (agentCtx) => {
-        // Install before composing preset listeners. Both policy stages fail closed.
+        // The official monotonic guard survives a pre-execute listener returning allow
+        // without next(). Register through the Agent context so other chats are unaffected.
+        agentCtx.tools.guard((exec) =>
+          this.allowedTools.includes(exec.name)
+            ? undefined
+            : `Desktop MCP bridge does not permit tool ${exec.name}.`,
+        );
+        // Keep the pre-execute and dispatch checks as additional scoped enforcement.
         agentCtx.on('tools/pre-execute', async (exec, next) => {
           if (!this.allowedTools.includes(exec.name))
             return {

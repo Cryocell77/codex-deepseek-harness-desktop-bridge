@@ -2,13 +2,13 @@
 
 [English](CODEX-PLUGIN.md) · [返回首页](../README.zh-CN.md) · [使用与权限](USAGE.zh-CN.md)
 
-**v0.2.0 安装包含两部分**：Codex 插件提供 MCP 服务和委派 Skill；Desktop 适配器运行在现有的官方 Desktop Host 中。委派任务需要两者，单独安装 Codex 插件不能完成桌面连接。
+**v0.2.1 将适配目标更新为 DSH 0.2.1-rc.1，安装包含两部分**：Codex 插件提供 MCP 服务和委派 Skill；Desktop 适配器运行在现有的官方 Desktop Host 中。委派任务需要两者，单独安装 Codex 插件不能完成桌面连接。
 
-需要 macOS、官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**、Codex 能找到的 Node **>=22.19.0**，以及支持便携 Agent Plugins 格式的 Codex 客户端。已验证 CLI **0.163.0-alpha.10.2** 可发现插件；真实签名桌面应用激活和实际模型执行仍[未验收](VALIDATION.md)。
+需要 macOS、官方 DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**、Codex 能找到的 Node **>=22.19.0**，以及支持便携 Agent Plugins 格式的 Codex 客户端。已验证 CLI **0.163.0-alpha.10.2** 可发现插件；真实签名桌面应用激活、模型回复、默认权限拒绝及取消均已通过，详见[验证记录与剩余限制](VALIDATION.md)。
 
 ## 安装 Codex 插件
 
-解压本地准备好的 `dsh-desktop-codex-plugin-0.2.0.zip`，在解压后的市场根目录执行：
+解压本地准备好的 `dsh-desktop-codex-plugin-0.2.1.zip`，在解压后的市场根目录执行：
 
 ```sh
 codex plugin marketplace add .
@@ -66,14 +66,14 @@ npm run package:plugin
 npm run verify:plugin
 ```
 
-生成的是本地文件，不代表已经公开发布：
+构建生成下列文件，并作为经所有者授权的 GitHub Release 附件：
 
 | 文件                                              | 用途                                                        |
 | ------------------------------------------------- | ----------------------------------------------------------- |
-| `outputs/dsh-desktop-codex-plugin-0.2.0.zip`      | 可安装的本地市场，包含 MCP、Skill、桌面适配器、文档与许可证 |
-| `outputs/dsh-desktop-mcp-bridge-0.2.0.tgz`        | Desktop 插件归档                                            |
-| `outputs/dsh-desktop-mcp-bridge-source-0.2.0.zip` | 源码、测试与构建产物，不含依赖、Git 内部文件和临时状态      |
-| `outputs/SHA256SUMS.txt`                          | 当前与保留基线归档的校验值                                  |
+| `outputs/dsh-desktop-codex-plugin-0.2.1.zip`      | 可安装的本地市场，包含 MCP、Skill、桌面适配器、文档与许可证 |
+| `outputs/dsh-desktop-mcp-bridge-0.2.1.tgz`        | Desktop 插件归档                                            |
+| `outputs/dsh-desktop-mcp-bridge-source-0.2.1.zip` | 源码、测试与构建产物，不含依赖、Git 内部文件和临时状态      |
+| `outputs/SHA256SUMS.txt`                          | 本版本三个归档的校验值                                      |
 
 `plugins/dsh-desktop/runtime/server.cjs` 与 Desktop 归档是生成文件，应修改源码后重新打包。MCP 包含运行依赖，可在没有 `node_modules` 的位置启动；`THIRD_PARTY_NOTICES.txt` 保留全部随包依赖许可证。Desktop 适配器仍需由官方 Host 解析其运行依赖，不包含 Desktop 二进制。没有自动安装或发布 hooks。
 

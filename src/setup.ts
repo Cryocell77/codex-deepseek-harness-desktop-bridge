@@ -4,7 +4,7 @@ import { lstat, mkdir, open, readFile, rename, rm } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { initialize, loadConfig, loadToken, privateDirectory } from './config.ts';
 import { fail, publicError } from './errors.ts';
-import { BRIDGE_VERSION } from './version.ts';
+import { BRIDGE_VERSION, DESKTOP_TARGET, CORDIS_TARGET } from './version.ts';
 export function defaultBridgePaths() {
   return {
     stateDir: resolve(homedir(), '.dsh-mcp-state'),
@@ -56,8 +56,8 @@ export async function setupInfo(configFile: string, pluginRoot?: string) {
     bridgeVersion: BRIDGE_VERSION,
     configFile,
     configuration,
-    desktopTarget: '0.2.0-rc.2',
-    cordisTarget: '4.0.4',
+    desktopTarget: DESKTOP_TARGET,
+    cordisTarget: CORDIS_TARGET,
     setupCommand: pluginRoot
       ? {
           command: process.execPath,

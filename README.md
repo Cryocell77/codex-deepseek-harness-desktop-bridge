@@ -1,18 +1,35 @@
+<p align="center">
+  <img src="icon.svg" alt="DSH Desktop MCP Bridge" width="80" height="80" />
+</p>
+
 # DSH Desktop MCP Bridge
 
 [简体中文](README.zh-CN.md) · [Setup guide](docs/CODEX-PLUGIN.md) · [Validation](docs/VALIDATION.md) · [Security](SECURITY.md)
 
-Let **Codex Desktop / CLI delegate tasks to your already running official DeepSeek Harness Desktop**, using its existing model configuration and runtime. Each delegated session gets a separate directory or Git worktree for Codex to review.
+**Desktop-to-Desktop delegation: Codex Desktop → your already running official DeepSeek Harness Desktop.** Reuse the Desktop model configuration and runtime; Codex CLI can use the same bridge too. Each delegated session gets a separate directory or Git worktree for Codex to review.
 
 This is an **unofficial, opt-in bridge**. It uses a plugin inside the existing Desktop Host and an authenticated local Unix socket. Codex starts the MCP stdio server; the bridge never launches another DSH CLI/Web runtime or extracts Desktop authentication secrets. [Architecture and source audit](docs/UPSTREAM-AUDIT.md).
 
+## Desktop-to-Desktop, without copying API keys
+
+```text
+Codex Desktop → MCP stdio → authenticated local Unix socket → existing DSH Desktop
+   delegate / review                                       model / Skills / allowed Tools
+```
+
+- **Reuse Desktop authentication.** Once DSH Desktop is signed in or has a working model provider, the bridge needs no separate DeepSeek API setup. No `DEEPSEEK_API_KEY` is required in Codex, the bridge config, an extra `.env`, or a bridge launch command.
+- **Use the running Desktop.** Task execution calls the existing Host's Agent services, without invoking the DSH CLI or launching an independent CLI/Web runtime. One-time plugin installation may still use Codex commands and the official Desktop Plugins page or application-owned installer.
+- **Reduce API key exposure.** Model credentials stay managed by DSH; the bridge protocol requires no model API key. Avoiding duplicate key files and environment variables reduces accidental disclosure. The bridge's private local authentication token is separate from model credentials.
+
+DSH still contacts its configured model provider. This design reduces credential copying; it does not eliminate every disclosure risk from authorized tools, prompts or model output. See the [security model](SECURITY.md).
+
 ## Compatibility and status
 
-**Experimental v0.2.0.** Automated integration and packaging checks have passed; installation inside the actual signed macOS Desktop application and real model execution **remain unverified**. See the [validation record and acceptance procedure](docs/VALIDATION.md).
+**Experimental v0.2.1.** Automated checks and actual signed macOS Desktop installation, model response, permission denial and cancellation **have passed**. Allowed file-editing tools and human approval UI routing still need live acceptance. Live checks used the unpublished development build documented in the [validation record](docs/VALIDATION.md); the final v0.2.1 artifacts passed automated checks.
 
 | Component       | Requirement / verified scope                                                                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
-| DSH Desktop     | Official macOS **0.2.0-rc.2**, Cordis **4.0.4**; other core versions are rejected                             |
+| DSH Desktop     | Official macOS **0.2.1-rc.1**, Cordis **4.0.5**; other core versions are rejected                             |
 | Codex           | Local Desktop/CLI with portable Agent Plugins support; discovery verified with CLI **0.163.0-alpha.10.2**     |
 | Node.js         | **>=22.19.0**, accessible to Codex                                                                            |
 | Git             | Required for repository worktrees                                                                             |
@@ -31,7 +48,14 @@ Installation has **two parts**:
 
 ### 1. Install the Codex plugin
 
-Use a locally prepared `dsh-desktop-codex-plugin-0.2.0.zip`. To build it from this source checkout:
+Install the tagged marketplace from GitHub (private repositories require your own authorized Git access):
+
+```sh
+codex plugin marketplace add Cryocell77/codex-deepseek-harness-desktop-bridge --ref v0.2.1
+codex plugin add dsh-desktop@dsh-desktop-bridge
+```
+
+Alternatively, download `dsh-desktop-codex-plugin-0.2.1.zip` from the [v0.2.1 release](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/releases/tag/v0.2.1). To build the archive from this source checkout:
 
 ```sh
 npm ci
@@ -45,7 +69,7 @@ codex plugin marketplace add .
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-The prepared ZIP needs no npm build. The bundled MCP starts without npm downloads; Desktop adapter dependencies may need network access. These instructions use local files and do not assume a published GitHub release or npm package.
+The prepared ZIP needs no npm build. The bundled MCP starts without npm downloads; Desktop adapter dependencies may need network access. The ZIP and Git marketplace bundle the runtime; installation does not depend on an npm publication.
 
 ### 2. Initialize and install the Desktop adapter
 

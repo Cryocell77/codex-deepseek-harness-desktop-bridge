@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Context } from '@deepseek-ai/cordis';
+import { PluginPackages } from '@deepseek-ai/dsh-app-boot';
+import { randomUUID } from 'node:crypto';
+import { lstat } from 'node:fs/promises';
+import { DESKTOP_TARGET, CORDIS_TARGET } from '../src/version.ts';
 import Loader from '@deepseek-ai/cordis-plugin-loader';
 import Group from '@deepseek-ai/cordis-plugin-group';
 import LlmRuntime, {
@@ -66,8 +70,12 @@ class ScriptAdapter extends LlmAdapter {
     yield { type: 'finish', reason: { kind: 'stop' } };
   }
 }
-async function compose(script: ('text' | 'tool' | 'hang' | 'failure')[]) {
+async function compose(
+  script: ('text' | 'tool' | 'hang' | 'failure')[],
+  toolBody?: (signal: AbortSignal) => Promise<void>,
+) {
   const ctx = new Context();
+  await ctx.plugin(PluginPackages, {});
   await ctx.plugin(Loader, { baseUrl: new URL('../', import.meta.url).href });
   ctx.loader.builtins.group = Group;
   for (const [name, config] of [
@@ -97,8 +105,9 @@ async function compose(script: ('text' | 'tool' | 'hang' | 'failure')[]) {
         name: 'fixture_tool',
         description: 'Test permission executor',
         parameters: {},
-        execute: async () => {
+        execute: async (_args, exec) => {
           executions++;
+          await toolBody?.(exec.signal);
           return [{ type: 'text', text: 'executed' }];
         },
       }),
@@ -169,7 +178,7 @@ test('real model failures report failure without exposing provider secrets', asy
 test('built plugin activates in a simulated Desktop profile and cleans up its socket on unload', async (t) => {
   const { fixture } = await import('./helpers.ts');
   const { BridgeClient } = await import('../src/transport.ts');
-  const f = await compose(['text']);
+  const f = await compose(['text', 'hang']);
   const local = await fixture();
   t.after(async () => {
     await f.ctx.fiber.dispose();
@@ -194,7 +203,6 @@ test('built plugin activates in a simulated Desktop profile and cleans up its so
   await f.ctx.loader.await();
   const client = await BridgeClient.fromConfig(local.file);
   const session = (await client.call('create_session', {})) as { sessionId: string };
-  const { randomUUID } = await import('node:crypto');
   const task = (await client.call('submit_task', {
     sessionId: session.sessionId,
     prompt: 'plugin smoke',
@@ -204,6 +212,152 @@ test('built plugin activates in a simulated Desktop profile and cleans up its so
   for (let i = 0; i < 100 && !result.complete; i++)
     result = (await client.call('get_result', { taskId: task.taskId })) as typeof result;
   assert.equal(result.output, 'official-runtime-response');
+  const waiting = (await client.call('submit_task', {
+    sessionId: session.sessionId,
+    prompt: 'cancel this follow-up',
+    requestId: randomUUID(),
+  })) as { taskId: string };
+  await until(() => f.adapter.requests.length === 2);
+  const cancellation = (await client.call('cancel_task', { taskId: waiting.taskId })) as {
+    state: string;
+  };
+  assert.equal(cancellation.state, 'cancelling');
+  let cancelled: { complete?: boolean; state?: string } = {};
+  for (let i = 0; i < 100 && !cancelled.complete; i++) {
+    cancelled = (await client.call('get_result', { taskId: waiting.taskId })) as typeof cancelled;
+    if (!cancelled.complete) await new Promise((r) => setTimeout(r, 5));
+  }
+  assert.equal(cancelled.state, 'cancelled');
+  const closed = (await client.call('close_session', { sessionId: session.sessionId })) as {
+    closed: boolean;
+    workspacePreserved: string;
+  };
+  assert.equal(closed.closed, true);
+  assert.ok((await lstat(closed.workspacePreserved)).isDirectory());
   await f.ctx.loader.resolve(entryId).fiber!.dispose();
   await assert.rejects(client.call('connection_info', {}), /socket is missing/);
+});
+
+test('monotonic allowlist survives pre-execute short circuit and does not restrict ordinary Desktop agents', async (t) => {
+  const f = await compose(['tool', 'text', 'tool', 'text']);
+  t.after(() => f.ctx.fiber.dispose());
+  const worker = await new DshDesktopRuntime(f.ctx, [], 1024).create('/tmp', 'standard');
+  const agent = f.ctx.agents.get(worker.id as Parameters<typeof f.ctx.agents.get>[0])!;
+  agent.ctx.on('tools/pre-execute', () => Promise.resolve({ kind: 'allow' }), { prepend: true });
+  await worker.run('attempt a denied call');
+  assert.equal(f.executions(), 0);
+  assert.match(JSON.stringify(agent.session.snapshotEvents()), /does not permit tool fixture_tool/);
+  const ordinary = await f.ctx.agents.create({
+    sessionId: `ordinary-${randomUUID()}` as Parameters<typeof f.ctx.agents.create>[0]['sessionId'],
+    meta: { cwd: '/tmp' },
+    agentOptions: { provider: 'bridge-test', model: 'configured-model' },
+    setup: async (ctx) => {
+      await f.ctx.agentPresets.mount(ctx, 'standard');
+    },
+  });
+  const { createUserMessage } = await import('@deepseek-ai/dsh-llm');
+  ordinary.agent.followup(
+    createUserMessage({
+      content: [{ type: 'text', text: 'ordinary chat tool' }],
+      source: { kind: 'desktop-mcp-bridge' },
+    }),
+  );
+  await ordinary.agent.whenIdle();
+  assert.equal(f.executions(), 1);
+  await worker.dispose();
+  await ordinary.dispose();
+});
+
+test('cancellation of an allowed in-flight tool waits for its actual quiescence', async (t) => {
+  let release!: () => void;
+  let started = false;
+  let signal!: AbortSignal;
+  const f = await compose(['tool'], async (value) => {
+    signal = value;
+    started = true;
+    await new Promise<void>((resolve) => {
+      release = resolve;
+    });
+  });
+  t.after(async () => {
+    release?.();
+    await f.ctx.fiber.dispose();
+  });
+  const session = await new DshDesktopRuntime(f.ctx, ['fixture_tool'], 1024).create(
+    '/tmp',
+    'standard',
+  );
+  let settled = false;
+  const running = session.run('run the slow tool').then((result) => {
+    settled = true;
+    return result;
+  });
+  await until(() => started);
+  session.cancel();
+  await until(() => signal.aborted);
+  assert.equal(settled, false);
+  release();
+  assert.equal((await running).outcome, 'cancelled');
+  await session.dispose();
+});
+
+test('task deadline cancels the official AgentLoop request and retains terminal result', async (t) => {
+  const { fixture } = await import('./helpers.ts');
+  const { TaskManager } = await import('../src/manager.ts');
+  const { terminal } = await import('../src/protocol.ts');
+  const f = await compose(['hang']);
+  const local = await fixture();
+  local.config.taskTimeoutMs = 100;
+  const manager = new TaskManager(local.config, new DshDesktopRuntime(f.ctx, [], 1024));
+  t.after(async () => {
+    await manager.dispose();
+    await f.ctx.fiber.dispose();
+    await local.cleanup();
+  });
+  const session = await manager.createSession({});
+  const task = manager.submit({
+    sessionId: session.sessionId,
+    prompt: 'timeout',
+    requestId: randomUUID(),
+  });
+  await until(() => terminal(manager.getTask(task.taskId).state));
+  assert.equal(manager.getResult(task.taskId).state, 'timed_out');
+  assert.equal(manager.getResult(task.taskId).complete, true);
+  assert.equal(f.adapter.requests[0]!.signal?.aborted, true);
+});
+
+test('official metadata lookup accepts only the exact new release and rejects absent packages', async (t) => {
+  const f = await compose([]);
+  t.after(() => f.ctx.fiber.dispose());
+  f.ctx.provide('profileContext', {
+    name: 'desktop',
+    dir: '/tmp',
+    patchPath: '',
+    installAnchor: '',
+    cwd: '/tmp',
+    home: '/tmp',
+    startedBundles: [],
+    overlays: [],
+    telemetryDisabledEnv: undefined,
+  });
+  await assertCompatible(f.ctx);
+  const lookup = f.ctx.pluginPackages.packageOf.bind(f.ctx.pluginPackages);
+  f.ctx.pluginPackages.packageOf = (specifier, parent) => {
+    const meta = lookup(specifier, parent);
+    return meta
+      ? { ...meta, version: specifier.endsWith('/cordis') ? '4.0.4' : meta.version }
+      : undefined;
+  };
+  await assert.rejects(
+    assertCompatible(f.ctx),
+    new RegExp(`cordis@${CORDIS_TARGET.replaceAll('.', '\\.')}`),
+  );
+  f.ctx.pluginPackages.packageOf = (specifier, parent) =>
+    specifier.endsWith('/dsh-tools') ? undefined : lookup(specifier, parent);
+  await assert.rejects(assertCompatible(f.ctx), /found unresolved/);
+  f.ctx.pluginPackages.packageOf = (specifier, parent) => {
+    const meta = lookup(specifier, parent);
+    return meta && specifier.endsWith('/dsh-agent') ? { ...meta, version: '0.2.0-rc.2' } : meta;
+  };
+  await assert.rejects(assertCompatible(f.ctx), new RegExp(DESKTOP_TARGET.replaceAll('.', '\\.')));
 });

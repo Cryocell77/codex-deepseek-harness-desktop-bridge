@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { BRIDGE_VERSION } from './version.ts';
+import { BRIDGE_VERSION, DESKTOP_TARGET } from './version.ts';
 import type { BridgeConfig } from './config.ts';
 import { fail, publicError } from './errors.ts';
 import { terminal, type SessionView, type TaskView } from './protocol.ts';
@@ -46,7 +46,7 @@ export class TaskManager {
     return {
       protocol: 1,
       bridgeVersion: BRIDGE_VERSION,
-      adapter: 'dsh-v0.2.0-rc.2',
+      adapter: `dsh-v${DESKTOP_TARGET}`,
       runtime: 'existing-desktop',
       instanceLifetime: 'until-plugin-unload',
       allowedTools: this.config.allowedTools,

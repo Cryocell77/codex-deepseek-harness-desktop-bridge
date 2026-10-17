@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 — 2026-10-17
+
+Target official DSH Desktop 0.2.1-rc.1 and Cordis 4.0.5 with exact release dependencies. Read package metadata through the official Host pluginPackages service, retain strict version checks, and add scoped monotonic tool guards alongside pre-execute/dispatch checks. Expand real-service tests for guard bypass attempts, ordinary-session isolation, in-flight tool cancellation, deadlines and socket task lifecycle. v0.2.0 remains the archived adapter for DSH 0.2.0-rc.2; it is not part of the new compatibility claim.
+
+The release number is **0.2.1**. The unpublished development build was temporarily labeled 0.3.0 during local acceptance testing; no v0.3.0 Git tag or GitHub Release was published. Add README icons and foreground Desktop-to-Desktop reuse of configured Desktop providers, with no extra model API key in Codex/bridge config and no DSH CLI invocation during task execution. Include installable marketplace, Desktop adapter and source archives with checksums in the GitHub release.
 
 Reorganize the English/Chinese landing pages around compatibility, the two-part plugin installation, first connection and task examples. Move standalone configuration, permissions/tool lifecycle and troubleshooting into matching English/Chinese guides; clarify staged adapter installation and preserve experimental acceptance limits. Include the linked contributor/security/changelog documents in the Desktop archive.
 

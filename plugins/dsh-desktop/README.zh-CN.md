@@ -1,8 +1,14 @@
+<p align="center">
+  <img src="assets/icon.svg" alt="DSH Desktop MCP Bridge" width="80" height="80" />
+</p>
+
 # DSH Desktop Bridge — Codex 插件
 
 [English](README.md)
 
-安装分为两部分：Codex 插件包含可离线启动的 MCP 服务与委派 Skill；随包 DSH Desktop 适配器需要另行安装到官方桌面端。需要 Node >=22.19，以及官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
+**Desktop-to-Desktop：** 复用正在运行的 DSH Desktop 与已配置的模型提供方，无需向 Codex 或桥接额外提供 API Key。任务执行不调用 DSH CLI，首次安装仍可使用应用自带安装命令。减少重复配置可降低 API_KEY 暴露风险；DSH 的模型请求和工具权限继续生效。
+
+安装分为两部分：Codex 插件包含可离线启动的 MCP 服务与委派 Skill；随包 DSH Desktop 适配器需要另行安装到官方桌面端。需要 Node >=22.19，以及官方 DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
 
 ## 在 Codex 安装
 
@@ -13,7 +19,7 @@ codex plugin marketplace add .
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-如果使用源码仓库，请先 `npm ci && npm run package:plugin`，再执行上面的命令。已经打包的 ZIP 不需要 npm。没有公开发布 v0.2.0 前，请使用本地路径安装；不要假设远端仓库已经包含本版本。
+如果使用源码仓库，请先 `npm ci && npm run package:plugin`，再执行上面的命令。已经打包的 ZIP 不需要 npm。安装包可从仓库 Releases 页面获取，不需要发布到 npm。
 
 ## 首次连接
 
@@ -40,4 +46,4 @@ codex plugin marketplace remove dsh-desktop-bridge
 
 这不会删除 DSH 适配器、配置、token 或任务文件。适配器应通过官方 Plugins 页面另行卸载，文件在确认不再使用后自行清理。
 
-本包为实验版；真实 Desktop 安装、界面和实际模型任务仍需验收。MIT；依赖许可证见 THIRD_PARTY_NOTICES.txt；无 DeepSeek/OpenAI 官方背书。
+本包为实验版；真实 Desktop 连接、模型回复、默认权限拒绝和取消已验证，获准编辑工具及人工审批界面仍待验收。MIT；依赖许可证见 THIRD_PARTY_NOTICES.txt；无 DeepSeek/OpenAI 官方背书。

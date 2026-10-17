@@ -1,69 +1,45 @@
-# Validation record / 验证记录
+# Validation / 验证记录
 
-## v0.2.0 plugin packaging
+Release **v0.2.1**, target **DSH 0.2.1-rc.1 / Cordis 4.0.5**, checked **2026-10-17 (Asia/Hong_Kong)**. [Archived v0.2.0 evidence](VALIDATION-v0.2.md) applies to the earlier adapter only.
 
-The v0.1.0 baseline is preserved at local commit `222d2c5` with annotated tag `v0.1.0`. The following v0.2.0 changes were made after that commit and have not been pushed.
+## Automated new-release checks
 
-- Strict typecheck/build and **23 tests passed, 0 failed, 0 skipped**. Added read-only setup/no-file-creation checks, repeat setup/token preservation, incomplete setup refusal, and relocated self-contained plugin startup with setup completed after MCP initialization. The adapter archive is staged in private persistent state and remains available after its original cached copy is removed.
-- Portable `plugin.json` and `mcp.json` passed the official Agent Plugins 1.0.0 JSON schemas; the packaged Skill passed Skill Creator validation.
-- The installed Codex CLI `0.163.0-alpha.10.2` discovered `dsh-desktop@dsh-desktop-bridge`, version `0.2.0`, through a read-only local-marketplace listing with temporary inline configuration overrides. The plugin was not installed into the user profile by this check.
-- The MCP launcher uses a bundled CommonJS server and works after copying the plugin to a directory with spaces and no node_modules. It lists 10 tools even when configuration is missing and reconnects after explicit setup without restarting MCP.
-- The extracted release ZIP was separately unpacked to a path with spaces: real Codex CLI discovery and SDK MCP initialization succeeded with 10 tools, no node_modules, no installation and no model calls. Its Desktop archive version and license/security resources were inspected.
-- The installed Electron Node runtime again passed all 6 official-service adapter tests after the v0.2.0 changes.
-- `npm run format:check` and `npm run verify:plugin` passed; dependency audit reported 0 vulnerabilities.
-- `npm run package:plugin` prepared a local marketplace ZIP, Desktop npm archive, complete source ZIP and SHA-256 checksums. It includes bundled third-party license notices and excludes private state/dependencies/research scratch directories.
+| Check                      | Result                                                                                                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exact dependencies         | Fresh install without force/legacy-peer-deps; dedicated local cache avoided an existing user npm-cache ownership error                                                 |
+| Strict typecheck and build | Passed against new-release public types                                                                                                                                |
+| Test suite                 | **27 passed, 0 failed, 0 skipped**; no live provider credentials                                                                                                       |
+| Task execution             | Real Cordis Loader, AgentLoop, Session, Preset and Default Model services with a scripted keyless LLM adapter; normal output and follow-ups passed                     |
+| Permissions                | Unallowlisted fixture denied; allowed fixture executed; pre-execute short circuit could not override the monotonic guard; ordinary Desktop agent remained unrestricted |
+| Cancellation               | Model request cancelled; allowed in-flight tool remained nonterminal until released; scripted provider deadline through the real AgentLoop resulted in `timed_out`     |
+| Socket lifecycle           | Built plugin in simulated Desktop profile: submission, terminal result, follow-up cancellation, session close preserving files, unload removing socket                 |
+| Version checks             | Official metadata accepted exact target; old Cordis/core and missing packages rejected                                                                                 |
+| Bundled Electron Node      | All **10 adapter tests passed** under the installed official app executable in Electron RunAsNode mode; separate temporary simulated contexts, not another Host        |
+| Existing safeguards        | Auth/origin/schema/bounds, idempotency, shutdown, quotas, errors and detached worktrees passed                                                                         |
+| Portable plugin            | Relocated bundle worked without node_modules and configuration could be created after MCP initialization                                                               |
 
-Actual Codex UI installation and signed DSH Desktop adapter activation/live-provider acceptance are still unverified. The existing core-adapter limitations apply. No public directory submission, npm publication, GitHub push or application/profile mutation occurred.
+These tests create separate temporary contexts/workspaces. They do not open another Harness CLI/Web runtime, alter provider credentials, broaden the user's tool policy or prove real signed-Desktop GUI behavior.
 
-## v0.1.0 baseline validation
+## Actual signed Desktop acceptance
 
-Date: **2026-10-17 (Asia/Hong_Kong)**. Local platform: macOS arm64. Development runtime: Node **24.21.0**, npm **11.19.0**. Installed official Desktop: **0.2.0-rc.2**, bundled Electron **44.0.0** / Node **24.18.1**. Its targeted ASAR package manifests confirm Cordis **4.0.4** and six checked DSH core packages at **0.2.0-rc.2**; no credentials were read.
+The live checks below were performed on the same adapter implementation in an **unpublished development build labeled 0.3.0**. At the owner's request, the release is numbered **0.2.1**. The live version values are preserved as observed; this is not a claim of a second live installation under the final number. The final 0.2.1 package is validated separately by the automated suite. No v0.3.0 Git tag or GitHub Release was published.
 
-## Executed successfully
+The user explicitly confirmed active work was saved and Desktop was fully quit. The application-owned `dsh plugin --profile desktop add` updated the installed adapter from 0.2.0 to 0.3.0 and passed the official lockfile supply-chain check. The Codex plugin was updated to 0.3.0 and confirmed installed/enabled. Desktop was reopened through its ordinary application launcher.
 
-| Check                        | Observed result                                                                                                                                                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Clean lockfile install       | `npm ci --ignore-scripts` succeeded, followed by the complete check command (20/20 passed)                                                                                                                                            |
-| `npm run typecheck`          | Strict TypeScript compilation passed against exact target-release DSH services                                                                                                                                                        |
-| `npm run build`              | MCP CLI and Desktop plugin built as ESM; executable CLI produced                                                                                                                                                                      |
-| `npm test`                   | **20 tests passed, 0 failed, 0 skipped**                                                                                                                                                                                              |
-| Official-service integration | Real Cordis Loader, AgentLoop, Session, Preset and default-model services; model provider is a scripted, keyless test adapter                                                                                                         |
-| Built plugin lifecycle       | Loaded built plugin in a **simulated** `desktop` profile; task completed; unloading removed socket and disposed owned agents                                                                                                          |
-| Permission execution         | Real tool executor denied unallowlisted tools; explicitly allowed fixture tool executed                                                                                                                                               |
-| Model errors / cancellation  | Failure state redacted provider errors; cancellation waited for actual idle; timeout remained cooperative                                                                                                                             |
-| Concurrency / shutdown       | Busy-session rejection, retained request deduplication/conflict, concurrent close joining, late-create disposal during shutdown                                                                                                       |
-| Local security / bounds      | Independent token auth, browser-origin refusal, wrong protocol/extra fields/invalid JSON, oversized body refusal, private-file/symlink checks, byte-safe UTF-8 truncation                                                             |
-| Workspaces                   | Separate detached Git worktrees; main checkout dirty file preserved; close preserved child edits                                                                                                                                      |
-| MCP stdio                    | Official SDK client launched built server, listed 9 tools and completed a round trip against a test bridge                                                                                                                            |
-| Bundled runtime              | **6 adapter tests passed** under the installed DSH Electron executable's Node mode, using the same simulated Profile and scripted provider; this did not open a Desktop window or launch a CLI/Web application                        |
-| `npm run format:check`       | Formatting check passed                                                                                                                                                                                                               |
-| `npm audit`                  | **0 reported vulnerabilities** at audit time; no guarantee about future advisories                                                                                                                                                    |
-| Clean packed installation    | Local `.tgz` installed into an empty temporary npm project with production dependencies only; no DSH peers were auto-installed; packed MCP initialized, listed 9 tools, and returned `DESKTOP_UNAVAILABLE` when no bridge was present |
-| Package inventory            | Runtime package contains built files, docs, examples, icon/locales, LICENSE/NOTICE; no token, private config, task workspace or node_modules                                                                                          |
+| Live check               | Observed result                                                                                                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Connection               | `runtime: existing-desktop`, bridge 0.3.0, adapter dsh-v0.2.1-rc.1, existing `allowedTools: []` unchanged                                                                                                        |
+| Task execution           | A new blank isolated session used the existing configured provider and returned exact `BRIDGE_V030_OK`; durable assistant/message and completed turn/end verified                                                |
+| Cooperative cancellation | A follow-up task moved running → cancelling → cancelled; complete:true observed and its own durable log recorded turn/end reason aborted                                                                         |
+| Negative permission      | A second new isolated session attempted one native read of a harmless probe file inside its own workspace; its own durable tool/result recorded isError:true and `Desktop MCP bridge does not permit tool read.` |
+| Cleanup                  | Both bridge-owned validation sessions closed; list_sessions returned empty; both workspaces remained for review                                                                                                  |
 
-Keyless official-service tests are in `tests/adapter.test.ts`; task/transport/worktree tests use controlled fixtures. The project CI file is prepared for Node 22/24 on macOS/Linux; **remote GitHub CI and the Node 22/Linux matrix have not been executed here**. No live model credentials or external paid requests were used.
+Evidence was checked only in these newly created validation sessions, including their compressed durable logs; unrelated chats and provider credentials were not read. Local sanitized evidence is saved as `outputs/VALIDATION-v0.3.0.json`. Three bounded live turns were submitted using the existing provider. The existing private config/token and tool allowlist were not modified. These live results supplement, rather than replace, positive allowed-tool and delayed-quiescence fixture tests.
 
-## Not verified / 未验证
+Actual allowed-tool editing, approval UI and rendered plugin metadata/icon are not claimed by these probes.
 
-- Installation and activation inside the user's actual signed Desktop profile, including packaged Host module resolution and plugin-manager UI outcomes.
-- Rendered English/Chinese plugin metadata and icon in the application.
-- A real provider task using existing Desktop credentials and user-installed Skills/Tools.
-- Human approval routing for tools that require it, live child editing under a selected real sandbox policy, and long-running external side effects.
-- Later DSH Desktop/core releases, Windows named pipes, multi-user/remote deployments, or persistent recovery.
+## Remaining scope
 
-The user profile, existing sessions and application files were not changed. The project did not create a GitHub repository, push code, publish a package or upload a release.
+Linux/Node 22 CI matrix, later DSH releases, Windows, long-running external side effects, real approval UI routing and production reliability remain outside local automated evidence. The live test run did not push code or publish npm packages; both local plugin updates were explicitly authorized. The subsequent v0.2.1 GitHub release is a separate owner-authorized publication step.
 
-## User-run signed Desktop acceptance procedure
-
-1. Review README and SECURITY. Build/pack locally. Save/finish current Desktop work before a restart; do not interrupt active sessions casually.
-2. Initialize new short private state/workspace roots. Leave `allowedTools` empty. Set the explicit plugin config path.
-3. Install the local package through the official Plugins surface or the Desktop-installed command while the application is quit. Reopen it; verify real activation and record shell/core/Cordis versions. Do not grant compatibility exemptions.
-4. Inspect plugin metadata in English and Chinese. Run `doctor`: confirm existing-desktop, correct adapter and default-deny policy. No model call should occur.
-5. Connect Codex using the documented stdio entry. Create a blank session, submit a harmless short response request, poll to terminal and inspect the returned text. This step uses the selected provider and may incur cost.
-6. Submit an idle-session follow-up and verify context continuity. Request cancellation during a suitably bounded task; verify `cancelling` changes to a terminal state only after actual stop.
-7. If tools are required, inspect exact tool names and implementations, allow only selected tools in local config, and reload. Test the real DSH approval UI where applicable. Remember that broad file/shell tools can reach outside cwd.
-8. For code work, add a trusted repository to the allowlist and create a worktree session. Make one harmless child edit; verify the main checkout is unchanged. Review the diff; close the session and verify child files remain.
-9. Disconnect/reconnect Codex and verify owned sessions still exist while Desktop remains running. Quit Desktop cleanly; verify calls fail explicitly and prompts are not replayed automatically after restart.
-10. Record observations here before declaring a public supported release. Keep workspaces for review and remove them manually only when safe.
-
-中文说明：20 项自动化测试与 6 项 bundled Electron Node 测试均通过，但后者使用模拟 Desktop Profile 与脚本模型。真实桌面应用安装、界面展示、现有模型凭据、Skills/Tools 和人工审批仍需按上面的步骤验收。此记录严格区分已执行的本地测试、准备好的 CI 与尚未验证的真实应用行为。
+中文：正式发布版本号为 v0.2.1；下方真实桌面证据来自未发布、临时标号为 0.3.0 的同一适配实现，保留实际观测版本，不伪称重新安装过最终版本。新版本自动化测试 27 项通过，覆盖官方服务上的工具白名单、提前允许监听器、普通会话权限不受影响、模型/工具取消、超时以及 socket 任务完整流程。真实 Desktop 已完成连接、模型回复、取消和默认权限拒绝验收；权限结论来自本次新建会话的持久工具错误事件，不依据模型自述。两个测试会话已关闭，工作区保留，用户白名单与 token 未改动。

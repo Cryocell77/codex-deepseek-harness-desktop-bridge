@@ -19,8 +19,8 @@ await writeFile(
   JSON.stringify(
     {
       bridge: pkg.version,
-      adapter: 'dsh-v0.2.0-rc.2',
-      upstream: '639ed015397290b3745d163aafe02ffee4aa3f84',
+      adapter: 'dsh-v0.2.1-rc.1',
+      upstream: '1600d8a1e140dcde43a1a0941940a0480712c011',
     },
     null,
     2,
