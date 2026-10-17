@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+.env
+*.token
+bridge-state/
+.DS_Store
+work/
+outputs/

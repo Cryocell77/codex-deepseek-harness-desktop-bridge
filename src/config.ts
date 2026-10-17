@@ -1,0 +1,153 @@
+import { constants } from 'node:fs';
+import { lstat, mkdir, open, realpath } from 'node:fs/promises';
+import { isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { randomBytes } from 'node:crypto';
+import { z } from 'zod';
+import { fail } from './errors.ts';
+export const configSchema = z
+  .object({
+    version: z.literal(1),
+    stateDir: z.string(),
+    workspaceRoot: z.string(),
+    allowedTools: z.array(z.string().min(1).max(128)).max(100),
+    allowedPresets: z.array(z.string().min(1).max(128)).min(1).max(20),
+    repositories: z.array(z.string()).max(20),
+    maxSessions: z.number().int().min(1).max(32),
+    maxTasks: z.number().int().min(1).max(1000),
+    maxPromptBytes: z.number().int().min(1).max(65536),
+    maxOutputBytes: z.number().int().min(128).max(1048576),
+    taskTimeoutMs: z.number().int().min(100).max(3600000),
+  })
+  .strict();
+export type BridgeConfig = z.infer<typeof configSchema>;
+export function contains(parent: string, child: string): boolean {
+  const r = relative(parent, child);
+  return r === '' || (!r.startsWith(`..${sep}`) && r !== '..' && !isAbsolute(r));
+}
+export function configPath(stateDir: string): string {
+  return join(stateDir, 'config.json');
+}
+export function socketPath(stateDir: string): string {
+  const p = join(stateDir, 'bridge.sock');
+  if (Buffer.byteLength(p) > 100)
+    fail('CONFIG', 'stateDir is too long for a macOS Unix socket (path must be <=100 bytes).');
+  return p;
+}
+export async function privateDirectory(path: string): Promise<string> {
+  if (!isAbsolute(path)) fail('CONFIG', 'Directory paths must be absolute.');
+  const stat = await lstat(path).catch(() =>
+    fail('UNSAFE_PATH', 'Bridge directory is missing or unreadable.'),
+  );
+  if (
+    !stat.isDirectory() ||
+    stat.isSymbolicLink() ||
+    stat.uid !== process.getuid?.() ||
+    (stat.mode & 0o077) !== 0
+  )
+    fail('UNSAFE_PATH', 'Bridge directories must be real, owner-only directories (0700).');
+  const actual = await realpath(path);
+  if (actual !== resolve(path))
+    fail('UNSAFE_PATH', 'Bridge paths must use canonical paths without symlink ancestors.');
+  return actual;
+}
+export async function readPrivate(path: string): Promise<string> {
+  const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW).catch(() =>
+    fail('CONFIG_UNREADABLE', 'Config/token file is missing, unreadable or a symlink.'),
+  );
+  try {
+    const stat = await file.stat();
+    if (
+      !stat.isFile() ||
+      stat.uid !== process.getuid?.() ||
+      (stat.mode & 0o077) !== 0 ||
+      stat.size > 65536
+    )
+      fail('UNSAFE_PATH', 'Config and token must be owner-only regular files <=64 KiB.');
+    return await file.readFile('utf8');
+  } finally {
+    await file.close();
+  }
+}
+export async function loadConfig(path: string): Promise<BridgeConfig> {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(await readPrivate(path));
+  } catch (error) {
+    if (error instanceof SyntaxError) fail('CONFIG', 'Invalid config JSON.');
+    throw error;
+  }
+  const validated = configSchema.safeParse(parsed);
+  if (!validated.success)
+    fail(
+      'CONFIG',
+      `Invalid configuration fields: ${validated.error.issues.map((issue) => issue.path.join('.')).join(', ')}`,
+    );
+  const c = validated.data;
+  await privateDirectory(c.stateDir);
+  await privateDirectory(c.workspaceRoot);
+  socketPath(c.stateDir);
+  if (resolve(path) !== configPath(c.stateDir))
+    fail('CONFIG', 'Config must be stateDir/config.json.');
+  if (contains(c.stateDir, c.workspaceRoot) || contains(c.workspaceRoot, c.stateDir))
+    fail('CONFIG', 'stateDir and workspaceRoot must be separate.');
+  for (const repo of c.repositories) {
+    if (!isAbsolute(repo) || (await realpath(repo)) !== repo)
+      fail('CONFIG', 'Repository allowlist paths must be canonical and absolute.');
+    if (contains(repo, c.workspaceRoot) || contains(c.workspaceRoot, repo))
+      fail('CONFIG', 'workspaceRoot must be outside every source repository.');
+  }
+  // These capabilities can change policy or spawn uncontrolled descendants.
+  if (
+    c.allowedTools.some((t) =>
+      /^(run_code|.*subagent.*|plugin_manager|.*plugin.*|.*schedule.*|.*workflow.*|.*goal.*)$/i.test(
+        t,
+      ),
+    )
+  )
+    fail(
+      'CONFIG',
+      'Composite execution, delegation, runtime mutation and autonomous scheduling tools are unsupported in v0.1.',
+    );
+  return c;
+}
+export async function loadToken(stateDir: string): Promise<string> {
+  await privateDirectory(stateDir);
+  const token = (await readPrivate(join(stateDir, 'auth.token'))).trim();
+  if (!/^[a-f0-9]{64}$/.test(token)) fail('CONFIG', 'Invalid bridge token.');
+  return token;
+}
+export async function initialize(stateDir: string, workspaceRoot: string): Promise<string> {
+  stateDir = resolve(stateDir);
+  workspaceRoot = resolve(workspaceRoot);
+  socketPath(stateDir);
+  if (contains(stateDir, workspaceRoot) || contains(workspaceRoot, stateDir))
+    fail('CONFIG', 'Choose separate state and workspace directories.');
+  await mkdir(stateDir, { mode: 0o700 }); // Deliberately refuses existing state; never rotates live credentials.
+  await mkdir(workspaceRoot, { mode: 0o700 });
+  await privateDirectory(stateDir);
+  await privateDirectory(workspaceRoot);
+  const c: BridgeConfig = {
+    version: 1,
+    stateDir,
+    workspaceRoot,
+    allowedTools: [],
+    allowedPresets: ['standard'],
+    repositories: [],
+    maxSessions: 8,
+    maxTasks: 100,
+    maxPromptBytes: 65536,
+    maxOutputBytes: 262144,
+    taskTimeoutMs: 300000,
+  };
+  const write = async (name: string, data: string) => {
+    const f = await open(join(stateDir, name), 'wx', 0o600);
+    try {
+      await f.writeFile(data);
+    } finally {
+      await f.close();
+    }
+  };
+  await write('auth.token', randomBytes(32).toString('hex'));
+  await write('config.json', JSON.stringify(c, null, 2) + '\n');
+  return configPath(stateDir);
+}
