@@ -25,7 +25,7 @@ DSH still contacts its configured model provider. This design reduces credential
 
 ## Compatibility and status
 
-**Experimental v0.2.1.** Automated checks and actual signed macOS Desktop installation, model response, permission denial and cancellation **have passed**. Allowed file-editing tools and human approval UI routing still need live acceptance. Live checks used the unpublished development build documented in the [validation record](docs/VALIDATION.md); the final v0.2.1 artifacts passed automated checks.
+**Experimental v0.2.1.** See the [validation record](docs/VALIDATION.md) for test coverage and known limitations.
 
 | Component       | Requirement / verified scope                                                                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -35,7 +35,7 @@ DSH still contacts its configured model provider. This design reduces credential
 | Git             | Required for repository worktrees                                                                             |
 | Other platforms | Linux transport is testable; Linux Desktop compatibility is not claimed; Windows transport is not implemented |
 
-**Both exact pairs passed 27 automated tests each**, including official AgentLoop execution, permissions, cancellation and built-plugin activation in a simulated Desktop profile. The old signed Desktop application has not had live end-to-end acceptance with this adapter; live evidence applies to 0.2.1-rc.1 only. Other versions (including 0.2.1-rc.2), mixed core packages and unresolved metadata are rejected. This is not support for every 0.2.0-rc or 0.2.1-rc release. The v0.2.1 tag and release assets were replaced at the owner’s request to include this tested older pair; existing installs must refresh both plugins.
+Only the version pairs listed above are supported. Other versions and mixed core packages are rejected.
 
 A new session takes the Desktop **default model at creation** and an allowlisted installed preset. Providers/credentials remain managed by Desktop. Skills follow normal DSH discovery in the new workspace; existing chats, per-chat overrides, unsaved text and uncommitted/ignored project files are not copied. [Reuse boundaries](docs/USAGE.md).
 

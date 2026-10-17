@@ -12,7 +12,7 @@
 
 ## 在 Codex 安装
 
-从本项目的发布准备 ZIP 解压后，在解压目录执行：
+解压发布 ZIP 后，在解压目录执行：
 
 ```sh
 codex plugin marketplace add .
@@ -46,4 +46,4 @@ codex plugin marketplace remove dsh-desktop-bridge
 
 这不会删除 DSH 适配器、配置、token 或任务文件。适配器应通过官方 Plugins 页面另行卸载，文件在确认不再使用后自行清理。
 
-本包为实验版；真实 Desktop 连接、模型回复、默认权限拒绝和取消已验证，获准编辑工具及人工审批界面仍待验收。MIT；依赖许可证见 THIRD_PARTY_NOTICES.txt；无 DeepSeek/OpenAI 官方背书。
+本包为实验版；测试覆盖范围及限制见仓库中的验证指南。MIT；依赖许可证见 THIRD_PARTY_NOTICES.txt；无 DeepSeek/OpenAI 官方背书。

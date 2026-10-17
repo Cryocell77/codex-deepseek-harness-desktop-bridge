@@ -6,7 +6,7 @@
 
 ## 构建并准备桌面适配器
 
-需要 macOS、官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / Cordis 4.0.5**、Node **>=22.19.0**、npm；使用 worktree 还需要 Git。其他 DSH 版本或核心包混装会被拒绝。两组均通过自动化测试，真实签名桌面验收仅适用于 0.2.1-rc.1。本项目仍为实验版，[真实签名桌面应用的基础验收已通过，获准编辑和审批仍待验收](VALIDATION.md)。
+需要 macOS、官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / Cordis 4.0.5**、Node **>=22.19.0**、npm；使用 worktree 还需要 Git。其他 DSH 版本或核心包混装会被拒绝。测试覆盖范围及限制见[验证记录](VALIDATION.md)。
 
 在源码仓库中执行：
 
@@ -73,7 +73,7 @@ macOS Desktop 在应用启动时读取登录 shell 环境，因此之后需完�
 "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.1.tgz
 ```
 
-重新打开 Desktop 并确认插件真实激活。不要用 npm 单独安装的 CLI 修改 Desktop Profile，也不要通过 CLI 启动该 Profile；不要用版本豁免绕过兼容性检查。官方插件管理器决定激活/重启状态。本项目没有自动修改你的 Desktop 配置。
+重新打开 Desktop 并确认插件真实激活。不要用 npm 单独安装的 CLI 修改 Desktop Profile，也不要通过 CLI 启动该 Profile；不要用版本豁免绕过兼容性检查。官方插件管理器决定激活/重启状态。
 
 ### 5. 验证连接
 

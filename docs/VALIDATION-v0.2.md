@@ -4,8 +4,6 @@
 
 ## v0.2.0 plugin packaging
 
-The v0.1.0 baseline is preserved at local commit `222d2c5` with annotated tag `v0.1.0`. The following v0.2.0 changes were made after that commit and have not been pushed.
-
 - Strict typecheck/build and **23 tests passed, 0 failed, 0 skipped**. Added read-only setup/no-file-creation checks, repeat setup/token preservation, incomplete setup refusal, and relocated self-contained plugin startup with setup completed after MCP initialization. The adapter archive is staged in private persistent state and remains available after its original cached copy is removed.
 - Portable `plugin.json` and `mcp.json` passed the official Agent Plugins 1.0.0 JSON schemas; the packaged Skill passed Skill Creator validation.
 - The installed Codex CLI `0.163.0-alpha.10.2` discovered `dsh-desktop@dsh-desktop-bridge`, version `0.2.0`, through a read-only local-marketplace listing with temporary inline configuration overrides. The plugin was not installed into the user profile by this check.
@@ -15,7 +13,7 @@ The v0.1.0 baseline is preserved at local commit `222d2c5` with annotated tag `v
 - `npm run format:check` and `npm run verify:plugin` passed; dependency audit reported 0 vulnerabilities.
 - `npm run package:plugin` prepared a local marketplace ZIP, Desktop npm archive, complete source ZIP and SHA-256 checksums. It includes bundled third-party license notices and excludes private state/dependencies/research scratch directories.
 
-Actual Codex UI installation and signed DSH Desktop adapter activation/live-provider acceptance are still unverified. The existing core-adapter limitations apply. No public directory submission, npm publication, GitHub push or application/profile mutation occurred.
+Actual Codex UI installation and signed DSH Desktop adapter activation/live-provider acceptance are still unverified.
 
 ## v0.1.0 baseline validation
 
@@ -53,8 +51,6 @@ Keyless official-service tests are in `tests/adapter.test.ts`; task/transport/wo
 - Human approval routing for tools that require it, live child editing under a selected real sandbox policy, and long-running external side effects.
 - Later DSH Desktop/core releases, Windows named pipes, multi-user/remote deployments, or persistent recovery.
 
-The user profile, existing sessions and application files were not changed. The project did not create a GitHub repository, push code, publish a package or upload a release.
-
 ## User-run signed Desktop acceptance procedure
 
 1. Review README and SECURITY. Build/pack locally. Save/finish current Desktop work before a restart; do not interrupt active sessions casually.
@@ -68,4 +64,4 @@ The user profile, existing sessions and application files were not changed. The 
 9. Disconnect/reconnect Codex and verify owned sessions still exist while Desktop remains running. Quit Desktop cleanly; verify calls fail explicitly and prompts are not replayed automatically after restart.
 10. Record observations here before declaring a public supported release. Keep workspaces for review and remove them manually only when safe.
 
-中文说明：20 项自动化测试与 6 项 bundled Electron Node 测试均通过，但后者使用模拟 Desktop Profile 与脚本模型。真实桌面应用安装、界面展示、现有模型凭据、Skills/Tools 和人工审批仍需按上面的步骤验收。此记录严格区分已执行的本地测试、准备好的 CI 与尚未验证的真实应用行为。
+中文说明：20 项自动化测试与 6 项 bundled Electron Node 测试均通过，但后者使用模拟 Desktop Profile 与脚本模型。真实桌面应用安装、界面展示、现有模型凭据、Skills/Tools 和人工审批仍需按上面的步骤验收。

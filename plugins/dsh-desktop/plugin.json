@@ -14,7 +14,7 @@
       "interface": {
         "displayName": "DSH Desktop Bridge",
         "shortDescription": "Delegate to your running DSH Desktop.",
-        "longDescription": "Use the existing official DSH Desktop model and preset in isolated task workspaces. Includes a bundled MCP server, an explicit setup helper and the Desktop adapter. Requires a tested official pair: DSH 0.2.0-rc.2 / Cordis 4.0.4 or 0.2.1-rc.1 / Cordis 4.0.5; does not launch another CLI/Web runtime.",
+        "longDescription": "Use the existing official DSH Desktop model and preset in isolated task workspaces. Includes a bundled MCP server, an explicit setup helper and the Desktop adapter. Supports DSH 0.2.0-rc.2 / Cordis 4.0.4 or 0.2.1-rc.1 / Cordis 4.0.5; does not launch another CLI/Web runtime.",
         "developerName": "DSH Desktop MCP Bridge contributors",
         "category": "Developer Tools",
         "brandColor": "#153448",

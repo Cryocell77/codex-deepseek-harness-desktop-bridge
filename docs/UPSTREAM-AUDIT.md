@@ -1,6 +1,6 @@
 # Official upstream audit / 官方源码核实
 
-Updated **2026-10-17 (Asia/Shanghai)** for bridge **v0.2.1**. [Archived v0.2.0 audit](UPSTREAM-AUDIT-v0.2.md) records the earlier implementation; the current shared adapter is independently retested on both targets.
+Bridge **v0.2.1**, reviewed **2026-10-17**. [Earlier audit](UPSTREAM-AUDIT-v0.2.md).
 
 | Subject                | Verified target                                                                                       |
 | ---------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -18,7 +18,7 @@ The installed application was inspected read-only, including targeted manifests 
 
 The [official Desktop README](https://github.com/deepseek-ai/deepseek-harness/blob/1600d8a1e140dcde43a1a0941940a0480712c011/apps/desktop/README.md) continues to describe an Electron-owned Host and Desktop profile, with application authentication and a documented plugin installation surface. No supported external MCP attach/pairing API was established by this audit. The bridge uses a Cordis plugin in that existing Host and its own private Unix socket/token protocol. It never boots a CLI/Web replacement or reads Host authentication material.
 
-Both pinned releases already provide `pluginPackages.packageOf` and `tools.guard()`: see the older [metadata service](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/boot/app-boot/src/profile-resolution/service.ts) and [Tools service](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/core/tools/src/index.ts). These are not APIs introduced by 0.2.1-rc.1.
+Both pinned releases already provide `pluginPackages.packageOf` and `tools.guard()`: see the older [metadata service](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/boot/app-boot/src/profile-resolution/service.ts) and [Tools service](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/core/tools/src/index.ts).
 
 ## Shared adapter decisions
 
@@ -30,6 +30,6 @@ Both pinned releases already provide `pluginPackages.packageOf` and `tools.guard
 
 ## Supported scope
 
-v0.2.1 accepts **DSH 0.2.0-rc.2 / Cordis 4.0.4 / Schemastery 3.18.4** and **DSH 0.2.1-rc.1 / Cordis 4.0.5 / Schemastery 3.18.5** as complete exact combinations. Both passed 27 automated tests each with real official services and a keyless scripted model. The older signed Desktop GUI has not been live-tested with this shared adapter. Other prereleases (including 0.2.1-rc.2), Linux Desktop and Windows are not claimed. Automated official-service evidence and actual signed-Desktop acceptance are distinguished in [validation](VALIDATION.md).
+The adapter requires either **DSH 0.2.0-rc.2 / Cordis 4.0.4 / Schemastery 3.18.4** or **DSH 0.2.1-rc.1 / Cordis 4.0.5 / Schemastery 3.18.5**, including matching DSH core packages. Test results and platform limits are in [VALIDATION.md](VALIDATION.md).
 
-中文：已读取本机更新后的应用版本及打包核心清单，固定到官方 `dsh-v0.2.1-rc.1`。两个固定版本均已提供官方包元数据服务和单向拒绝权限守卫，并非新版独有。当前共享适配器在两套独立官方依赖中分别通过 27 项测试，仅允许两组完整版本组合，不放宽为整个 rc 系列；旧版签名桌面端尚未实机验收。任务仍运行在现有 Desktop Host，新版本不会通过启动独立 CLI/Web 或放宽认证实现兼容。
+中文：桥接通过官方插件机制接入现有 Desktop Host，使用独立的本地 socket 认证。适配器检查完整核心版本组合；源码引用及依赖版本见上表，测试记录见验证文档。

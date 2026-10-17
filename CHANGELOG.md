@@ -2,16 +2,23 @@
 
 ## 0.2.1 — 2026-10-17
 
-Republished at the owner’s request with the same version and replacement tag/assets (original v0.2.1 commit: `28e3654`). Accept official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4 / Schemastery 3.18.4** and **0.2.1-rc.1 / Cordis 4.0.5 / Schemastery 3.18.5** as complete exact combinations. Both independent dependency trees passed strict typechecking and all 27 automated tests. Report the detected pair in connection info and the ready marker. Reject mixed, unresolved and untested packages; no wildcard prerelease support. Read package metadata through the official Host pluginPackages service, retain strict version checks, and add scoped monotonic tool guards alongside pre-execute/dispatch checks. Expand real-service tests for guard bypass attempts, ordinary-session isolation, in-flight tool cancellation, deadlines and socket task lifecycle. v0.2.0 remains archived. Old signed-Desktop live end-to-end acceptance with the current adapter is still outstanding; recorded live checks apply to 0.2.1-rc.1 only.
-
-The release number is **0.2.1**. The unpublished development build was temporarily labeled 0.3.0 during local acceptance testing; no v0.3.0 Git tag or GitHub Release was published. Add README icons and foreground Desktop-to-Desktop reuse of configured Desktop providers, with no extra model API key in Codex/bridge config and no DSH CLI invocation during task execution. Include installable marketplace, Desktop adapter and source archives with checksums in the GitHub release.
-
-Reorganize the English/Chinese landing pages around compatibility, the two-part plugin installation, first connection and task examples. Move standalone configuration, permissions/tool lifecycle and troubleshooting into matching English/Chinese guides; clarify staged adapter installation and preserve experimental acceptance limits. Include the linked contributor/security/changelog documents in the Desktop archive.
+- Support DSH Desktop 0.2.0-rc.2 / Cordis 4.0.4 and 0.2.1-rc.1 / Cordis 4.0.5, with matching core packages and Schemastery versions.
+- Detect Host package versions through `pluginPackages` and report the connected version in setup and connection diagnostics.
+- Add per-agent `tools.guard()` checks alongside execution hooks.
+- Extend regression coverage for permissions, cancellation, deadlines and plugin lifecycle; add an isolated compatibility test runner.
+- Add README icons and reorganize English and Chinese installation, usage and troubleshooting guides.
+- Provide Codex plugin, Desktop adapter and source archives with SHA-256 checksums.
 
 ## 0.2.0 — 2026-10-17
 
-Add a portable Codex plugin and local marketplace, bundled offline MCP launcher, delegation skill, explicit repeatable setup and packaged Desktop adapter. MCP can initialize before configuration exists; local read-only `dsh_setup_info` exposes setup diagnostics. Both sides discover explicitly initialized default private configuration. Build retains dependency license notices and generates installable/source ZIPs plus checksums. The v0.1.0 baseline is preserved in local commit 222d2c5 and tag v0.1.0. No push or publication was performed.
+- Add a portable Codex plugin, local marketplace and bundled MCP launcher.
+- Add `dsh_setup_info` and repeatable setup with default configuration discovery.
+- Stage the Desktop adapter in persistent private storage.
+- Include dependency notices and distribution archives with checksums.
 
 ## 0.1.0 — 2026-10-17
 
-Initial experimental local bridge for official DSH Desktop 0.2.0-rc.2: MCP stdio, authenticated Unix socket, exact-release Cordis adapter, isolated sessions/worktrees, task/follow-up submission, polling/results, cooperative cancellation, retained request deduplication and default-deny tool policy. Includes keyless real-service tests, bilingual setup, source audit, security and manual release preparation. No GitHub/npm publication and no signed-Desktop live-model compatibility claim.
+- Add MCP stdio and an authenticated Unix socket bridge for DSH Desktop 0.2.0-rc.2.
+- Add isolated sessions/worktrees, task submission, follow-ups, polling, results and cooperative cancellation.
+- Enforce a default-deny tool policy and retained request deduplication.
+- Add tests, bilingual setup guides, source references and security documentation.

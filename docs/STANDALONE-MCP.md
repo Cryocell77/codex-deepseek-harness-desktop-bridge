@@ -6,7 +6,7 @@ Use this route if you want only the MCP server, are developing the bridge, or yo
 
 ## Build and prepare the Desktop archive
 
-Requirements: macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**, Node **>=22.19.0**, npm, and Git for worktrees. Other DSH versions and mixed core pairs fail closed. Both exact pairs passed automated tests; signed-Desktop live acceptance applies only to 0.2.1-rc.1. This is experimental; [basic signed-Desktop acceptance passed; allowed edits/approval remain open](VALIDATION.md).
+Requirements: macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**, Node **>=22.19.0**, npm, and Git for worktrees. Other DSH versions and mixed core packages are rejected. See [validation](VALIDATION.md) for test coverage and limitations.
 
 From the source checkout:
 
@@ -66,7 +66,7 @@ Replace every example path with your actual absolute path. The installer below a
    "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.1.tgz
    ```
 
-   Reopen Desktop and observe plugin activation. Do not use an npm-installed CLI to mutate the Desktop profile, do not launch that profile as a CLI, and do not use version-exemption flags. The installed application's Plugins UI owns activation/restart outcomes. This repository has not automatically installed a plugin or changed your profile.
+   Reopen Desktop and observe plugin activation. Do not use an npm-installed CLI to mutate the Desktop profile, do not launch that profile as a CLI, and do not use version-exemption flags. The installed application's Plugins UI owns activation/restart outcomes.
 
 5. Confirm connection without submitting a model task:
 

@@ -32,4 +32,4 @@ codex plugin remove dsh-desktop@dsh-desktop-bridge
 codex plugin marketplace remove dsh-desktop-bridge
 ```
 
-Uninstalling this Codex plugin preserves the Desktop adapter, credentials/config and task files; remove those separately when safe. Experimental: signed-Desktop connection, live model response, default-deny enforcement and cancellation passed. Allowed editing tools and approval UI still need live acceptance. MIT; bundled dependency licenses are in THIRD_PARTY_NOTICES.txt. No DeepSeek/OpenAI endorsement.
+Uninstalling this Codex plugin preserves the Desktop adapter, credentials/config and task files; remove those separately when safe. Experimental; see the repository validation guide for test coverage and limitations. MIT; bundled dependency licenses are in THIRD_PARTY_NOTICES.txt. No DeepSeek/OpenAI endorsement.
