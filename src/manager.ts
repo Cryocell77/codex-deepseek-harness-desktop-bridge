@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { BRIDGE_VERSION, DESKTOP_TARGET } from './version.ts';
+import { BRIDGE_VERSION, SUPPORTED_DESKTOPS, type DesktopCompatibility } from './version.ts';
 import type { BridgeConfig } from './config.ts';
 import { fail, publicError } from './errors.ts';
 import { terminal, type SessionView, type TaskView } from './protocol.ts';
@@ -41,12 +41,16 @@ export class TaskManager {
   constructor(
     private config: BridgeConfig,
     private runtime: DesktopRuntime,
+    private compatibility?: DesktopCompatibility,
   ) {}
   info() {
     return {
       protocol: 1,
       bridgeVersion: BRIDGE_VERSION,
-      adapter: `dsh-v${DESKTOP_TARGET}`,
+      adapter: this.compatibility ? `dsh-v${this.compatibility.desktop}` : 'test-runtime',
+      desktopVersion: this.compatibility?.desktop,
+      cordisVersion: this.compatibility?.cordis,
+      supportedDesktops: SUPPORTED_DESKTOPS.map((target) => ({ ...target })),
       runtime: 'existing-desktop',
       instanceLifetime: 'until-plugin-unload',
       allowedTools: this.config.allowedTools,

@@ -13,7 +13,6 @@ import {
 import { BridgeError, fail, publicError } from './errors.ts';
 import { envelope, operations, type Operation } from './protocol.ts';
 import type { TaskManager } from './manager.ts';
-import { DESKTOP_TARGET } from './version.ts';
 async function body(req: IncomingMessage, limit: number): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -173,7 +172,7 @@ export async function startBridge(
         version: 1,
         pid: process.pid,
         instanceId: ownership,
-        adapter: `dsh-v${DESKTOP_TARGET}`,
+        adapter: manager.info().adapter,
       }),
       { mode: 0o600, flag: 'wx' },
     );

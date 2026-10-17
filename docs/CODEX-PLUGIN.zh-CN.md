@@ -2,9 +2,9 @@
 
 [English](CODEX-PLUGIN.md) · [返回首页](../README.zh-CN.md) · [使用与权限](USAGE.zh-CN.md)
 
-**v0.2.1 将适配目标更新为 DSH 0.2.1-rc.1，安装包含两部分**：Codex 插件提供 MCP 服务和委派 Skill；Desktop 适配器运行在现有的官方 Desktop Host 中。委派任务需要两者，单独安装 Codex 插件不能完成桌面连接。
+**v0.2.1 接受两组经过测试的精确 Desktop/核心版本组合，安装包含两部分**：Codex 插件提供 MCP 服务和委派 Skill；Desktop 适配器运行在现有的官方 Desktop Host 中。委派任务需要两者，单独安装 Codex 插件不能完成桌面连接。
 
-需要 macOS、官方 DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**、Codex 能找到的 Node **>=22.19.0**，以及支持便携 Agent Plugins 格式的 Codex 客户端。已验证 CLI **0.163.0-alpha.10.2** 可发现插件；真实签名桌面应用激活、模型回复、默认权限拒绝及取消均已通过，详见[验证记录与剩余限制](VALIDATION.md)。
+需要 macOS、官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / Cordis 4.0.5**、Codex 能找到的 Node **>=22.19.0**，以及支持便携 Agent Plugins 格式的 Codex 客户端。已验证 CLI **0.163.0-alpha.10.2** 可发现插件；0.2.1-rc.1 真实签名桌面应用激活、模型回复、默认权限拒绝及取消均已通过，0.2.0-rc.2 仅完成官方服务自动化测试，详见[验证记录与剩余限制](VALIDATION.md)。
 
 ## 安装 Codex 插件
 
@@ -38,6 +38,8 @@ MCP 在尚未配置时也能完成初始化，提供诊断工具；显式初始�
 新自定义目录先按[独立配置指南](STANDALONE-MCP.zh-CN.md)显式初始化，再向插件 setup 传入已有配置。使用目录参数时，`--state-dir` 与 `--workspace-root` 必须同时提供。若选择独立 MCP 路径，按该指南手动注册，避免再注册同一插件的 MCP。
 
 ## 更新与卸载
+
+**本次 v0.2.1 同版本替换：** 市场或版本缓存可能保留旧文件。请从 Release 重新下载 ZIP 并核对 `SHA256SUMS.txt`；若刷新 Git 市场仍保留旧副本，可使用新解压目录作为本地市场源，必要时移除后重新添加 Codex 插件。确认 `dsh_setup_info.supportedDesktops` 列出两组精确版本。再次运行显式 setup 以替换持久保存的同版本适配器归档，再于 Desktop 完全退出后重新安装。仅看到 `0.2.1` 版本号不能证明已更新。
 
 本地市场先更新/重新构建源目录，再刷新市场并重新安装：
 

@@ -2,9 +2,9 @@
 
 [简体中文](CODEX-PLUGIN.zh-CN.md) · [README](../README.md) · [Usage and permissions](USAGE.md)
 
-Version **0.2.1** replaces the v0.2.0 adapter target with DSH 0.2.1-rc.1. It has two installable parts: the Codex plugin contains the MCP server and delegation skill; the Desktop adapter runs inside the existing official Desktop Host. Both are required for delegation. Installing the Codex plugin alone does not connect Desktop.
+Version **0.2.1** accepts two tested exact Desktop/core pairs; it does not accept a whole release series. It has two installable parts: the Codex plugin contains the MCP server and delegation skill; the Desktop adapter runs inside the existing official Desktop Host. Both are required for delegation. Installing the Codex plugin alone does not connect Desktop.
 
-Requires macOS, official DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**, and Node **>=22.19.0** accessible to Codex. Codex must support the portable Agent Plugins format; discovery was verified with CLI **0.163.0-alpha.10.2**. Actual signed-Desktop activation, model response, default-deny permission enforcement and cancellation passed; see [validation and remaining limits](VALIDATION.md).
+Requires macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**, and Node **>=22.19.0** accessible to Codex. Codex must support the portable Agent Plugins format; discovery was verified with CLI **0.163.0-alpha.10.2**. Actual signed-Desktop activation, model response, default-deny permission enforcement and cancellation passed on 0.2.1-rc.1; 0.2.0-rc.2 passed automated official-service tests only; see [validation and remaining limits](VALIDATION.md).
 
 ## Install from the prepared ZIP
 
@@ -36,6 +36,8 @@ Default setup needs no separate MCP registration or shell edit. For a custom exi
 ## Update and uninstall
 
 Refresh the configured marketplace and reinstall the Codex plugin with `codex plugin marketplace upgrade dsh-desktop-bridge` and `codex plugin add dsh-desktop@dsh-desktop-bridge`. For a local source, rebuild/update that directory before refreshing the marketplace and reinstalling. Keep the local marketplace source available for future refreshes. New releases keep their own versioned Desktop archives in private state. Run setup again, then update the Desktop adapter via the official surface after saving/quitting Desktop; do not force a live Host restart.
+
+**Same-version v0.2.1 replacement:** a marketplace/version cache can retain the original bytes. Download the rebuilt ZIP from the release, verify `SHA256SUMS.txt`, and use a fresh extracted directory as your local marketplace source if refreshing the Git marketplace retains the old copy. Remove/re-add the Codex plugin as needed; confirm `dsh_setup_info.supportedDesktops` lists both exact pairs. Run explicit setup again to replace the staged same-version adapter archive, then reinstall it in fully quit Desktop. Do not treat an existing `0.2.1` version string as proof that the replacement is installed.
 
 ```sh
 codex plugin remove dsh-desktop@dsh-desktop-bridge

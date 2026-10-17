@@ -9,7 +9,7 @@ This is an experimental local integration. It assumes the current macOS account,
 - Unix socket only. State directory 0700, socket/token/config 0600, current UID ownership, regular-file/no-final-symlink reads, canonical bridge directory paths.
 - Independent random 256-bit token, constant-time comparison, no browser-origin requests, no Host cookie/key extraction.
 - Schema validation, input/output byte limits, session/task quotas, one active task per session, bounded socket connections and request times.
-- Default-deny tool-name allowlist enforced by the new-release monotonic per-agent tools.guard(), plus pre-execute and execute hooks. A pre-execute listener returning allow without next() cannot override a guard denial. Known composite/delegation/runtime-mutation/autonomous scheduling tool names are unsupported in v0.2.1. Do not enable third-party equivalents that evade those names.
+- Default-deny tool-name allowlist enforced by the monotonic per-agent tools.guard() present in both tested upstream releases, plus pre-execute and execute hooks. A pre-execute listener returning allow without next() cannot override a guard denial. Known composite/delegation/runtime-mutation/autonomous scheduling tool names are unsupported in v0.2.1. Do not enable third-party equivalents that evade those names.
 - Repository allowlist, resolved commit refs, unique detached worktrees, no automatic merge/delete/commit.
 - Task deadline requests real cancellation; no pretend terminal state before quiescence.
 - All returned text is labeled untrusted. Generic runtime errors prevent leaking provider credentials through transport errors.

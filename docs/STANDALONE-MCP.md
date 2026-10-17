@@ -6,7 +6,7 @@ Use this route if you want only the MCP server, are developing the bridge, or yo
 
 ## Build and prepare the Desktop archive
 
-Requirements: macOS, official DSH Desktop **0.2.1-rc.1 / Cordis 4.0.5**, Node **>=22.19.0**, npm, and Git for worktrees. Later DSH releases fail closed. This is experimental; [basic signed-Desktop acceptance passed; allowed edits/approval remain open](VALIDATION.md).
+Requirements: macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**, Node **>=22.19.0**, npm, and Git for worktrees. Other DSH versions and mixed core pairs fail closed. Both exact pairs passed automated tests; signed-Desktop live acceptance applies only to 0.2.1-rc.1. This is experimental; [basic signed-Desktop acceptance passed; allowed edits/approval remain open](VALIDATION.md).
 
 From the source checkout:
 

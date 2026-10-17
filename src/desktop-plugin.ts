@@ -7,35 +7,53 @@ import { TaskManager } from './manager.ts';
 import { startBridge } from './transport.ts';
 import { fail } from './errors.ts';
 import { pathExists, resolveConfigFile } from './setup.ts';
-import { DESKTOP_TARGET, CORDIS_TARGET } from './version.ts';
+import { SUPPORTED_DESKTOPS, type DesktopCompatibility } from './version.ts';
 export const name = 'dsh-desktop-mcp-bridge';
 export const inject = ['agents', 'agentPresets', 'agentDefaultModel', 'tools', 'pluginPackages'];
 export interface Config {
   configFile?: string;
 }
 export const Config = schema.object({ configFile: schema.string() });
-export async function assertCompatible(ctx: Context): Promise<void> {
+export async function assertCompatible(ctx: Context): Promise<DesktopCompatibility> {
   if (ctx.get('profileContext')?.name !== 'desktop')
     fail('UNSUPPORTED_HOST', 'This plugin only connects to an existing official Desktop profile.');
   const packages = ctx.get('pluginPackages');
   if (!packages) fail('UNSUPPORTED_HOST', 'Official Desktop package metadata service is required.');
-  for (const pkg of [
+  const names = [
     'cordis',
+    'schemastery',
     'dsh-agent',
     'dsh-session',
     'dsh-llm',
     'dsh-tools',
     'dsh-agent-preset-registry',
     'dsh-agent-default-model',
-  ]) {
-    const expected = pkg === 'cordis' ? CORDIS_TARGET : DESKTOP_TARGET;
-    const metadata = packages.packageOf(`@deepseek-ai/${pkg}`, import.meta.url);
-    if (metadata?.name !== `@deepseek-ai/${pkg}` || metadata.version !== expected)
-      fail(
-        'UNSUPPORTED_VERSION',
-        `Adapter requires ${pkg}@${expected}; found ${metadata?.version ?? 'unresolved'}. Bridge stays disabled.`,
-      );
+  ];
+  const observed = names.map((name) => ({
+    name,
+    metadata: packages.packageOf(`@deepseek-ai/${name}`, import.meta.url),
+  }));
+  const compatible = SUPPORTED_DESKTOPS.find((target) =>
+    observed.every(({ name, metadata }) => {
+      const expected =
+        name === 'cordis'
+          ? target.cordis
+          : name === 'schemastery'
+            ? target.schemastery
+            : target.desktop;
+      return metadata?.name === `@deepseek-ai/${name}` && metadata.version === expected;
+    }),
+  );
+  if (!compatible) {
+    const found = observed
+      .map(({ name, metadata }) => `${name}@${metadata?.version ?? 'unresolved'}`)
+      .join(', ');
+    fail(
+      'UNSUPPORTED_VERSION',
+      `Unsupported Desktop dependency combination: ${found}. Requires one complete tested version pair; bridge stays disabled.`,
+    );
   }
+  return { ...compatible };
 }
 export async function apply(ctx: Context, options: Config = {}): Promise<void> {
   const explicit = options.configFile ?? (process.env.DSH_DESKTOP_BRIDGE_CONFIG || undefined);
@@ -46,12 +64,13 @@ export async function apply(ctx: Context, options: Config = {}): Promise<void> {
     );
     return;
   }
-  await assertCompatible(ctx);
+  const compatibility = await assertCompatible(ctx);
   const config = await loadConfig(file);
   if (file !== configPath(config.stateDir)) fail('CONFIG', 'Use canonical configFile path.');
   const manager = new TaskManager(
     config,
     new DshDesktopRuntime(ctx, config.allowedTools, config.maxOutputBytes),
+    compatibility,
   );
   await ctx.effect(async () => {
     const stop = await startBridge(config, manager);

@@ -29,11 +29,13 @@ DSH still contacts its configured model provider. This design reduces credential
 
 | Component       | Requirement / verified scope                                                                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
-| DSH Desktop     | Official macOS **0.2.1-rc.1**, Cordis **4.0.5**; other core versions are rejected                             |
+| DSH Desktop     | Official macOS **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**; exact pairs only               |
 | Codex           | Local Desktop/CLI with portable Agent Plugins support; discovery verified with CLI **0.163.0-alpha.10.2**     |
 | Node.js         | **>=22.19.0**, accessible to Codex                                                                            |
 | Git             | Required for repository worktrees                                                                             |
 | Other platforms | Linux transport is testable; Linux Desktop compatibility is not claimed; Windows transport is not implemented |
+
+**Both exact pairs passed 27 automated tests each**, including official AgentLoop execution, permissions, cancellation and built-plugin activation in a simulated Desktop profile. The old signed Desktop application has not had live end-to-end acceptance with this adapter; live evidence applies to 0.2.1-rc.1 only. Other versions (including 0.2.1-rc.2), mixed core packages and unresolved metadata are rejected. This is not support for every 0.2.0-rc or 0.2.1-rc release. The v0.2.1 tag and release assets were replaced at the owner’s request to include this tested older pair; existing installs must refresh both plugins.
 
 A new session takes the Desktop **default model at creation** and an allowlisted installed preset. Providers/credentials remain managed by Desktop. Skills follow normal DSH discovery in the new workspace; existing chats, per-chat overrides, unsaved text and uncommitted/ignored project files are not copied. [Reuse boundaries](docs/USAGE.md).
 
@@ -85,7 +87,7 @@ Save active work and **fully quit DSH Desktop**, then install the staged adapter
 
 > Call `dsh_connection_info`. Report the runtime, adapter version and effective permissions without submitting a model task.
 
-Expect `runtime: "existing-desktop"` and the target adapter version. This checks the bridge connection; it does not validate provider credentials. Default `allowedTools: []` permits conversation while denying every model tool call.
+Expect `runtime: "existing-desktop"` and `adapter: "dsh-v0.2.0-rc.2"` or `"dsh-v0.2.1-rc.1"`, matching the connected Desktop. `desktopVersion` and `cordisVersion` report the detected pair; `supportedDesktops` lists both tested pairs. This checks the bridge connection; it does not validate provider credentials. Default `allowedTools: []` permits conversation while denying every model tool call.
 
 For standalone MCP or custom configuration paths, follow the [alternative setup guide](docs/STANDALONE-MCP.md). Choose one Codex registration route to avoid duplicate tools.
 

@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import supportedDesktops from '../src/compatibility.json' with { type: 'json' };
 import { chmod, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
@@ -19,8 +20,7 @@ await writeFile(
   JSON.stringify(
     {
       bridge: pkg.version,
-      adapter: 'dsh-v0.2.1-rc.1',
-      upstream: '1600d8a1e140dcde43a1a0941940a0480712c011',
+      supportedDesktops,
     },
     null,
     2,

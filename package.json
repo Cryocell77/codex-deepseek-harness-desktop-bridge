@@ -44,16 +44,17 @@
     "format:check": "prettier --check src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown .agents plugins --ignore-path .prettierignore",
     "format": "prettier --write src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown .agents plugins --ignore-path .prettierignore",
     "package:plugin": "npm run build && node scripts/package-plugin.mjs",
-    "verify:plugin": "node scripts/verify-plugin.mjs"
+    "verify:plugin": "node scripts/verify-plugin.mjs",
+    "test:compatibility": "npm run build && node scripts/test-compatibility.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
     "zod": "4.4.3"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "4.0.5",
-    "@deepseek-ai/dsh-llm": "0.2.1-rc.1",
-    "@deepseek-ai/schemastery": "3.18.5"
+    "@deepseek-ai/cordis": "4.0.4 || 4.0.5",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2 || 0.2.1-rc.1",
+    "@deepseek-ai/schemastery": "3.18.4 || 3.18.5"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": {

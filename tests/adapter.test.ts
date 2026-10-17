@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { Context } from '@deepseek-ai/cordis';
 import { PluginPackages } from '@deepseek-ai/dsh-app-boot';
 import { randomUUID } from 'node:crypto';
-import { lstat } from 'node:fs/promises';
-import { DESKTOP_TARGET, CORDIS_TARGET } from '../src/version.ts';
+import { lstat, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { SUPPORTED_DESKTOPS } from '../src/version.ts';
 import Loader from '@deepseek-ai/cordis-plugin-loader';
 import Group from '@deepseek-ai/cordis-plugin-group';
 import LlmRuntime, {
@@ -195,13 +196,23 @@ test('built plugin activates in a simulated Desktop profile and cleans up its so
     overlays: [],
     telemetryDisabledEnv: undefined,
   });
-  await assertCompatible(f.ctx);
+  const matched = await assertCompatible(f.ctx);
   const entryId = await f.ctx.loader.create({
     name: new URL('../dist/desktop-plugin.js', import.meta.url).href,
     config: { configFile: local.file },
   });
   await f.ctx.loader.await();
   const client = await BridgeClient.fromConfig(local.file);
+  const info = (await client.call('connection_info', {})) as {
+    adapter: string;
+    desktopVersion: string;
+    cordisVersion: string;
+  };
+  assert.equal(info.adapter, `dsh-v${matched.desktop}`);
+  assert.equal(info.desktopVersion, matched.desktop);
+  assert.equal(info.cordisVersion, matched.cordis);
+  const ready = JSON.parse(await readFile(join(local.config.stateDir, 'ready.json'), 'utf8'));
+  assert.equal(ready.adapter, info.adapter);
   const session = (await client.call('create_session', {})) as { sessionId: string };
   const task = (await client.call('submit_task', {
     sessionId: session.sessionId,
@@ -326,7 +337,7 @@ test('task deadline cancels the official AgentLoop request and retains terminal 
   assert.equal(f.adapter.requests[0]!.signal?.aborted, true);
 });
 
-test('official metadata lookup accepts only the exact new release and rejects absent packages', async (t) => {
+test('official metadata accepts complete supported pairs and rejects mixed or unresolved packages', async (t) => {
   const f = await compose([]);
   t.after(() => f.ctx.fiber.dispose());
   f.ctx.provide('profileContext', {
@@ -340,24 +351,45 @@ test('official metadata lookup accepts only the exact new release and rejects ab
     overlays: [],
     telemetryDisabledEnv: undefined,
   });
-  await assertCompatible(f.ctx);
-  const lookup = f.ctx.pluginPackages.packageOf.bind(f.ctx.pluginPackages);
-  f.ctx.pluginPackages.packageOf = (specifier, parent) => {
-    const meta = lookup(specifier, parent);
-    return meta
-      ? { ...meta, version: specifier.endsWith('/cordis') ? '4.0.4' : meta.version }
-      : undefined;
-  };
-  await assert.rejects(
-    assertCompatible(f.ctx),
-    new RegExp(`cordis@${CORDIS_TARGET.replaceAll('.', '\\.')}`),
+  const actual = await assertCompatible(f.ctx);
+  assert.equal(
+    actual.desktop,
+    f.ctx.pluginPackages.packageOf('@deepseek-ai/dsh-agent', import.meta.url)!.version,
   );
+  const lookup = f.ctx.pluginPackages.packageOf.bind(f.ctx.pluginPackages);
+  for (const target of SUPPORTED_DESKTOPS) {
+    f.ctx.pluginPackages.packageOf = (specifier, parent) => {
+      const meta = lookup(specifier, parent);
+      const version = specifier.endsWith('/cordis')
+        ? target.cordis
+        : specifier.endsWith('/schemastery')
+          ? target.schemastery
+          : target.desktop;
+      return meta ? { ...meta, version } : undefined;
+    };
+    assert.deepEqual(await assertCompatible(f.ctx), target);
+  }
+  for (const [name, version] of [
+    ['cordis', actual.cordis === '4.0.4' ? '4.0.5' : '4.0.4'],
+    ['schemastery', actual.schemastery === '3.18.4' ? '3.18.5' : '3.18.4'],
+  ]) {
+    f.ctx.pluginPackages.packageOf = (specifier, parent) => {
+      const meta = lookup(specifier, parent);
+      return meta && specifier.endsWith(`/${name}`) ? { ...meta, version } : meta;
+    };
+    await assert.rejects(assertCompatible(f.ctx), /Unsupported Desktop dependency combination/);
+  }
   f.ctx.pluginPackages.packageOf = (specifier, parent) =>
     specifier.endsWith('/dsh-tools') ? undefined : lookup(specifier, parent);
-  await assert.rejects(assertCompatible(f.ctx), /found unresolved/);
+  await assert.rejects(assertCompatible(f.ctx), /dsh-tools@unresolved/);
   f.ctx.pluginPackages.packageOf = (specifier, parent) => {
     const meta = lookup(specifier, parent);
-    return meta && specifier.endsWith('/dsh-agent') ? { ...meta, version: '0.2.0-rc.2' } : meta;
+    return meta && specifier.endsWith('/dsh-agent') ? { ...meta, version: '0.2.1-rc.2' } : meta;
   };
-  await assert.rejects(assertCompatible(f.ctx), new RegExp(DESKTOP_TARGET.replaceAll('.', '\\.')));
+  await assert.rejects(assertCompatible(f.ctx), /Unsupported Desktop dependency combination/);
+  f.ctx.pluginPackages.packageOf = (specifier, parent) => {
+    const meta = lookup(specifier, parent);
+    return meta && specifier.endsWith('/dsh-agent') ? { ...meta, name: 'wrong-package' } : meta;
+  };
+  await assert.rejects(assertCompatible(f.ctx), /Unsupported Desktop dependency combination/);
 });

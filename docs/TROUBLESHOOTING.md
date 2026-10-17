@@ -14,7 +14,7 @@ A model saying it cannot edit files can be expected: `allowedTools: []` blocks e
 
 ## Errors and runtime limits
 
-- `UNSUPPORTED_VERSION`: use the pinned Desktop release or develop/test a new adapter. Do not bypass this check. Later releases are not supported by this adapter.
+- `UNSUPPORTED_VERSION`: use a complete tested Desktop/core pair from the README or develop/test a new adapter. Do not bypass this check. Later releases are not supported by this adapter.
 - `DESKTOP_UNAVAILABLE`: Desktop is closed, plugin is disabled/unconfigured, or the configured state directory differs.
 - `ALREADY_RUNNING` / `STALE_SOCKET`: never delete a live lock. After a crash, verify Desktop/Host has fully quit; then remove only `bridge.lock`, `bridge.sock` and `ready.json` in the configured state directory before reopening. Keep config, token and workspaces.
 - `UNSAFE_PATH`: verify ownership, mode, canonical absolute paths and absence of symlinks. Do not make a shared directory private by changing its mode blindly.

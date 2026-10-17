@@ -14,7 +14,7 @@
 
 ## 错误与运行限制
 
-- `UNSUPPORTED_VERSION`：版本不匹配，需要新增并测试适配器；不要绕过检查。
+- `UNSUPPORTED_VERSION`：应使用 README 中列出的完整精确版本组合，其他版本需要新增并测试适配器；不要绕过检查。
 - `DESKTOP_UNAVAILABLE`：应用未开、插件未配置/未启用，或双方状态目录不一致。
 - `ALREADY_RUNNING` / `STALE_SOCKET`：不要删除活跃锁。崩溃后先确认 Desktop/Host 完全退出，再只删除状态目录中的 `bridge.lock`、`bridge.sock`、`ready.json`，保留 token、配置和工作区。
 - `UNSAFE_PATH`：检查所有者、权限与路径是否包含软链接；不要随意修改共享目录权限。
