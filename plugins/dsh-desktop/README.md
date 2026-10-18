@@ -8,7 +8,7 @@
 
 **Desktop-to-Desktop:** reuse the running DSH Desktop and its configured provider, without another model API key in Codex or bridge configuration. Task execution does not invoke the DSH CLI; installation can still use the application-owned installer. This reduces duplicated API key exposure while keeping DSH provider calls and tool permissions in effect.
 
-Installation has two parts: this Codex plugin contains a self-contained MCP server and delegation skill; the bundled adapter must also be installed separately into official DSH Desktop. Requires Node >=22.19 and official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**. Starting the MCP server downloads nothing and never launches another Harness CLI/Web runtime.
+Installation has two parts: this Codex plugin contains a self-contained MCP server and delegation skill; the bundled adapter must also be installed separately into official DSH Desktop. Requires Node >=22.19 and official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / 0.2.1-rc.2 with Cordis 4.0.5**. Starting the MCP server downloads nothing and never launches another Harness CLI/Web runtime.
 
 Extract the prepared marketplace ZIP, then from its root:
 

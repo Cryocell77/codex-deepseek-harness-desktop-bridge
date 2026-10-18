@@ -6,7 +6,7 @@
 
 ## 构建并准备桌面适配器
 
-需要 macOS、官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / Cordis 4.0.5**、Node **>=22.19.0**、npm；使用 worktree 还需要 Git。其他 DSH 版本或核心包混装会被拒绝。测试覆盖范围及限制见[验证记录](VALIDATION.md)。
+需要 macOS、官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / 0.2.1-rc.2（Cordis 4.0.5）**、Node **>=22.19.0**、npm；使用 worktree 还需要 Git。其他 DSH 版本或核心包混装会被拒绝。测试覆盖范围及限制见[验证记录](VALIDATION.md)。
 
 在源码仓库中执行：
 
@@ -16,7 +16,7 @@ npm run check
 npm pack
 ```
 
-`dist/cli.js` 是独立 MCP 入口；`npm pack` 在仓库根目录生成 `dsh-desktop-mcp-bridge-0.2.1.tgz`。需要保留构建后的源码目录及其运行依赖，供 Codex 启动服务。自动化模型测试均使用无需 API Key 的脚本化提供方。
+`dist/cli.js` 是独立 MCP 入口；`npm pack` 在仓库根目录生成 `dsh-desktop-mcp-bridge-0.2.1-rc2.tgz`。需要保留构建后的源码目录及其运行依赖，供 Codex 启动服务。自动化模型测试均使用无需 API Key 的脚本化提供方。
 
 ## 配置并连接
 
@@ -45,7 +45,7 @@ node /absolute/path/to/bridge/dist/cli.js init \
 - `maxPromptBytes` / `maxOutputBytes`：输入、文本结果的字节限制。
 - `taskTimeoutMs`：任务截止时间，超时请求协作取消。
 
-配置在插件加载时读取；改动后需要重新加载插件/重启 Desktop。v0.2.1 拒绝 `run_code` 及已知委派、插件管理、调度、工作流、目标自治类工具；优先使用原生工具 Preset。**工具名白名单和独立工作目录不是操作系统沙箱。** 一旦允许 shell/通用文件工具，它们可能访问目录之外的文件。仓库 worktree 创建也可能执行该可信仓库的 Git checkout hook。
+配置在插件加载时读取；改动后需要重新加载插件/重启 Desktop。v0.2.1-rc2 拒绝 `run_code` 及已知委派、插件管理、调度、工作流、目标自治类工具；优先使用原生工具 Preset。**工具名白名单和独立工作目录不是操作系统沙箱。** 一旦允许 shell/通用文件工具，它们可能访问目录之外的文件。仓库 worktree 创建也可能执行该可信仓库的 Git checkout hook。
 
 ### 3. 配置 Desktop 插件
 
@@ -70,7 +70,7 @@ macOS Desktop 在应用启动时读取登录 shell 环境，因此之后需完�
 通过官方 Desktop 的 **Plugins** 页面安装本地归档/包路径。也可以先打开 Desktop 初始化一次 Profile，再**完全退出**，使用 **Desktop 自带的 `dsh` 命令**：
 
 ```sh
-"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.1.tgz
+"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add /absolute/path/to/dsh-desktop-mcp-bridge-0.2.1-rc2.tgz
 ```
 
 重新打开 Desktop 并确认插件真实激活。不要用 npm 单独安装的 CLI 修改 Desktop Profile，也不要通过 CLI 启动该 Profile；不要用版本豁免绕过兼容性检查。官方插件管理器决定激活/重启状态。

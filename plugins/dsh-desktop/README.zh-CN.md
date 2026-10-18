@@ -8,7 +8,7 @@
 
 **Desktop-to-Desktop：** 复用正在运行的 DSH Desktop 与已配置的模型提供方，无需向 Codex 或桥接额外提供 API Key。任务执行不调用 DSH CLI，首次安装仍可使用应用自带安装命令。减少重复配置可降低 API_KEY 暴露风险；DSH 的模型请求和工具权限继续生效。
 
-安装分为两部分：Codex 插件包含可离线启动的 MCP 服务与委派 Skill；随包 DSH Desktop 适配器需要另行安装到官方桌面端。需要 Node >=22.19，以及官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / Cordis 4.0.5**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
+安装分为两部分：Codex 插件包含可离线启动的 MCP 服务与委派 Skill；随包 DSH Desktop 适配器需要另行安装到官方桌面端。需要 Node >=22.19，以及官方 DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / 0.2.1-rc.2（Cordis 4.0.5）**。运行时不会下载 npm 包，也不会启动第二套 DSH CLI/Web。
 
 ## 在 Codex 安装
 

@@ -372,6 +372,7 @@ test('official metadata accepts complete supported pairs and rejects mixed or un
   for (const [name, version] of [
     ['cordis', actual.cordis === '4.0.4' ? '4.0.5' : '4.0.4'],
     ['schemastery', actual.schemastery === '3.18.4' ? '3.18.5' : '3.18.4'],
+    ['dsh-session', actual.desktop === '0.2.1-rc.1' ? '0.2.1-rc.2' : '0.2.1-rc.1'],
   ]) {
     f.ctx.pluginPackages.packageOf = (specifier, parent) => {
       const meta = lookup(specifier, parent);
@@ -384,7 +385,7 @@ test('official metadata accepts complete supported pairs and rejects mixed or un
   await assert.rejects(assertCompatible(f.ctx), /dsh-tools@unresolved/);
   f.ctx.pluginPackages.packageOf = (specifier, parent) => {
     const meta = lookup(specifier, parent);
-    return meta && specifier.endsWith('/dsh-agent') ? { ...meta, version: '0.2.1-rc.2' } : meta;
+    return meta && specifier.endsWith('/dsh-agent') ? { ...meta, version: '0.2.1-rc.3' } : meta;
   };
   await assert.rejects(assertCompatible(f.ctx), /Unsupported Desktop dependency combination/);
   f.ctx.pluginPackages.packageOf = (specifier, parent) => {

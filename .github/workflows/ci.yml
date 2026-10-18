@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run test:compatibility -- --desktop 0.2.0-rc.2
+      - run: npm run test:compatibility -- --desktop 0.2.1-rc.1
       - run: npm run format:check
       - run: npm audit --omit=dev
       - run: npm pack --dry-run

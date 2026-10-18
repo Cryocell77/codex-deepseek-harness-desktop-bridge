@@ -9,7 +9,7 @@ This is an experimental local integration. It assumes the current macOS account,
 - Unix socket only. State directory 0700, socket/token/config 0600, current UID ownership, regular-file/no-final-symlink reads, canonical bridge directory paths.
 - Independent random 256-bit token, constant-time comparison, no browser-origin requests, no Host cookie/key extraction.
 - Schema validation, input/output byte limits, session/task quotas, one active task per session, bounded socket connections and request times.
-- Default-deny tool-name allowlist enforced by the monotonic per-agent tools.guard() present in both tested upstream releases, plus pre-execute and execute hooks. A pre-execute listener returning allow without next() cannot override a guard denial. Known composite/delegation/runtime-mutation/autonomous scheduling tool names are unsupported in v0.2.1. Do not enable third-party equivalents that evade those names.
+- Default-deny tool-name allowlist enforced by the monotonic per-agent tools.guard() present in all supported upstream releases, plus pre-execute and execute hooks. A pre-execute listener returning allow without next() cannot override a guard denial. Known composite/delegation/runtime-mutation/autonomous scheduling tool names are unsupported in v0.2.1-rc2. Do not enable third-party equivalents that evade those names.
 - Repository allowlist, resolved commit refs, unique detached worktrees, no automatic merge/delete/commit.
 - Task deadline requests real cancellation; no pretend terminal state before quiescence.
 - All returned text is labeled untrusted. Generic runtime errors prevent leaking provider credentials through transport errors.
@@ -32,6 +32,4 @@ Configuration is a load-time snapshot. To revoke tools, stop active tasks and re
 
 ## Reporting
 
-The release repository is currently private. Use its access-controlled issue tracker for sanitized reports, and arrange a private channel with the maintainer before sharing sensitive details. Never include tokens, credentials, private prompts or source code in a public issue. If the repository becomes public, the maintainer should enable GitHub private vulnerability reporting or provide a private security contact before accepting sensitive vulnerability reports.
-
-安全边界：本项目防止误连接、未经令牌认证的本地访问、常规并发文件冲突和默认未授权工具执行。它不构成操作系统沙箱，也不隔离同一用户的恶意软件或进程内恶意插件。仓库目前为私有；报告先脱敏，敏感细节应与维护者另行约定私密渠道。公开仓库前应启用私密漏洞报告或提供私密联系渠道。
+Report vulnerabilities privately to the maintainers. Use GitHub private vulnerability reporting when available; otherwise request a private contact without posting sensitive details. Do not include tokens, credentials, private prompts or source code in public issues.

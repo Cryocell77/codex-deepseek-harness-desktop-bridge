@@ -6,7 +6,7 @@
 
 生成的配置默认为 `allowedTools: []`、`allowedPresets: ["standard"]`、`repositories: []`。可进行模型对话，但拒绝全部模型工具执行，也未允许任何源仓库。连接检查成功不能证明模型任务一定能够执行。
 
-先核对已安装工具的真实权限，再编辑私有 `config.json`：在 `allowedTools` 添加精确工具名，在 `repositories` 添加规范的 Git 顶层绝对路径，在 `allowedPresets` 添加已安装 Preset 名称。工具及其名称取决于已安装的 Preset/插件，没有通用的安全工具清单。v0.2.1 仍不支持 `run_code` 及已知委派、插件管理、调度、工作流、目标自治类工具。未授权工具可能仍对模型可见，但执行会被拒绝。
+先核对已安装工具的真实权限，再编辑私有 `config.json`：在 `allowedTools` 添加精确工具名，在 `repositories` 添加规范的 Git 顶层绝对路径，在 `allowedPresets` 添加已安装 Preset 名称。工具及其名称取决于已安装的 Preset/插件，没有通用的安全工具清单。v0.2.1-rc2 仍不支持 `run_code` 及已知委派、插件管理、调度、工作流、目标自治类工具。未授权工具可能仍对模型可见，但执行会被拒绝。
 
 其他配置项：
 

@@ -2,13 +2,13 @@
 
 [简体中文](CODEX-PLUGIN.zh-CN.md) · [README](../README.md) · [Usage and permissions](USAGE.md)
 
-Version **0.2.1** accepts two tested exact Desktop/core pairs; it does not accept a whole release series. It has two installable parts: the Codex plugin contains the MCP server and delegation skill; the Desktop adapter runs inside the existing official Desktop Host. Both are required for delegation. Installing the Codex plugin alone does not connect Desktop.
+Version **0.2.1-rc2** accepts three tested exact Desktop/core combinations; it does not accept a whole release series. It has two installable parts: the Codex plugin contains the MCP server and delegation skill; the Desktop adapter runs inside the existing official Desktop Host. Both are required for delegation. Installing the Codex plugin alone does not connect Desktop.
 
-Requires macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**, and Node **>=22.19.0** accessible to Codex. Codex must support the portable Agent Plugins format; discovery was verified with CLI **0.163.0-alpha.10.2**. See [validation](VALIDATION.md) for test coverage and limitations.
+Requires macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / 0.2.1-rc.2 with Cordis 4.0.5**, and Node **>=22.19.0** accessible to Codex. Codex must support the portable Agent Plugins format; discovery was verified with CLI **0.163.0-alpha.10.2**. See [validation](VALIDATION.md) for test coverage and limitations.
 
 ## Install from the prepared ZIP
 
-Unzip `dsh-desktop-codex-plugin-0.2.1.zip`. Open a terminal in its extracted root, then:
+Unzip `dsh-desktop-codex-plugin-0.2.1-rc2.zip`. Open a terminal in its extracted root, then:
 
 ```sh
 codex plugin marketplace add .
@@ -55,9 +55,9 @@ npm run verify:plugin
 
 Build outputs:
 
-- `outputs/dsh-desktop-codex-plugin-0.2.1.zip`: installable local marketplace, bundled MCP/skill, Desktop adapter, documentation and licenses.
-- `outputs/dsh-desktop-mcp-bridge-0.2.1.tgz`: Desktop plugin npm archive.
-- `outputs/dsh-desktop-mcp-bridge-source-0.2.1.zip`: source/tests plus built payloads, excluding dependencies, Git internals and scratch/state directories.
+- `outputs/dsh-desktop-codex-plugin-0.2.1-rc2.zip`: installable local marketplace, bundled MCP/skill, Desktop adapter, documentation and licenses.
+- `outputs/dsh-desktop-mcp-bridge-0.2.1-rc2.tgz`: Desktop plugin npm archive.
+- `outputs/dsh-desktop-mcp-bridge-source-0.2.1-rc2.zip`: source/tests plus built payloads, excluding dependencies, Git internals and scratch/state directories.
 - `outputs/SHA256SUMS.txt`: checksums of the three archives for this release.
 
 MCP code is bundled with its dependencies into CommonJS for Node, so moving the installed copy does not require `node_modules`, a global npm package or network. Build-generated THIRD_PARTY_NOTICES.txt retains the license text of every included dependency. The Desktop archive retains official API peers and runtime dependency installation; it does not bundle a Desktop binary or start one. No Codex lifecycle hooks, npm install-time hooks or automatic publishing workflows are included.

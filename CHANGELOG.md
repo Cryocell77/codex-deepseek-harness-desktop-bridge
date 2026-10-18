@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1-rc2 — 2026-10-18
+
+- Add support for DSH Desktop 0.2.1-rc.2 / Cordis 4.0.5 / Schemastery 3.18.5.
+- Pin development dependencies to the rc.2 release and retain compatibility with 0.2.0-rc.2 and 0.2.1-rc.1.
+- Extend version checks for mixed core packages and keep task, permission and cancellation behavior unchanged.
+- Update plugin metadata, setup diagnostics and distribution archives.
+
 ## 0.2.1 — 2026-10-17
 
 - Support DSH Desktop 0.2.0-rc.2 / Cordis 4.0.4 and 0.2.1-rc.1 / Cordis 4.0.5, with matching core packages and Schemastery versions.

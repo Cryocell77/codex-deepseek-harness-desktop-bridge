@@ -10,5 +10,11 @@
     "cordis": "4.0.5",
     "schemastery": "3.18.5",
     "upstream": "1600d8a1e140dcde43a1a0941940a0480712c011"
+  },
+  {
+    "desktop": "0.2.1-rc.2",
+    "cordis": "4.0.5",
+    "schemastery": "3.18.5",
+    "upstream": "687f282e8625c6b8d11ff58211a90524be2e4317"
   }
 ]

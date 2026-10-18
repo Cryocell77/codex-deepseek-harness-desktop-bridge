@@ -1,12 +1,13 @@
 # Validation / 验证记录
 
-Bridge **v0.2.1**, macOS arm64, **2026-10-17**. Earlier results: [v0.2.0](VALIDATION-v0.2.md).
+Bridge **v0.2.1-rc2**, macOS arm64, **2026-10-18 (Asia/Hong_Kong)**. Earlier results: [v0.2.0](VALIDATION-v0.2.md).
 
 ## Compatibility matrix
 
 | Desktop/core | Cordis | Schemastery | Typecheck | Automated suite | Live Desktop                 |
 | ------------ | ------ | ----------- | --------- | --------------- | ---------------------------- |
 | 0.2.0-rc.2   | 4.0.4  | 3.18.4      | Passed    | 27 passed       | Not tested                   |
+| 0.2.1-rc.2   | 4.0.5  | 3.18.5      | Passed    | 27 passed       | Not tested                   |
 | 0.2.1-rc.1   | 4.0.5  | 3.18.5      | Passed    | 27 passed       | Development build, see below |
 
 Run `npm run test:compatibility` to install each release's dependencies in a separate temporary directory and run typechecking and the full suite. Select one target with `-- --desktop 0.2.0-rc.2`. The tests use official Cordis, Loader, AgentLoop, Session, Preset and Default Model services with a scripted model provider; no API key is required.
@@ -24,11 +25,11 @@ Run `npm run test:compatibility` to install each release's dependencies in a sep
 | Workspaces         | Detached Git worktrees, preservation of main-checkout changes and retained child files                 |
 | Portable bundle    | Relocation without node_modules, MCP initialization before setup and later reconnection                |
 
-The newer dependency tree also passed all 10 adapter tests under the installed application's bundled Node in Electron RunAsNode mode. These use simulated contexts rather than a live Desktop Host.
+The 0.2.1-rc.2 dependency tree also passed all 10 adapter tests under the installed application's bundled Node in Electron RunAsNode mode. These use simulated contexts rather than a live Desktop Host.
 
-## Live Desktop run
+## Earlier Desktop run
 
-Environment: signed macOS DSH Desktop **0.2.1-rc.1**, pre-release bridge build, `allowedTools: []`. The final v0.2.1 package was checked by the automated suite above; it was not separately installed for this live run.
+Environment: signed macOS DSH Desktop **0.2.1-rc.1**, pre-release bridge build, `allowedTools: []`. This run used Desktop 0.2.1-rc.1; rc.2 has not had live end-to-end validation.
 
 | Check          | Result                                                                                        |
 | -------------- | --------------------------------------------------------------------------------------------- |
@@ -41,10 +42,10 @@ Environment: signed macOS DSH Desktop **0.2.1-rc.1**, pre-release bridge build, 
 
 ## Remaining checks
 
-- Live end-to-end testing on Desktop 0.2.0-rc.2.
+- Live end-to-end testing on Desktop 0.2.0-rc.2 and 0.2.1-rc.2.
 - Allowed file edits and tool approval UI routing.
 - Rendered plugin metadata and icon.
 - Linux Desktop, Windows transport and other DSH versions.
 - Long-running external side effects and production reliability.
 
-中文：两组兼容版本均通过类型检查和自动化测试。0.2.1-rc.1 的桌面连接、模型回复、工具拒绝及取消经过开发构建实测；最终 v0.2.1 包和旧版桌面端的实机测试范围见上表。获准文件编辑及人工审批仍待验证。
+中文：三个精确版本组合均通过类型检查和自动化测试。rc.2 在应用内置 Node 上通过适配器测试；其真实 Desktop Host 的端到端流程仍待验证。较早的实机记录来自 rc.1，见上表。

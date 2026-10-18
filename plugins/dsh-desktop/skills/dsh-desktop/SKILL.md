@@ -3,7 +3,7 @@ name: dsh-desktop
 description: Set up or use the installed DSH Desktop Bridge plugin to delegate tasks to an already running official DeepSeek Harness Desktop and review its results.
 ---
 
-Use this plugin for delegation to the existing Desktop Host. The adapter accepts only complete tested official pairs: DSH 0.2.0-rc.2 with Cordis 4.0.4 / Schemastery 3.18.4, or DSH 0.2.1-rc.1 with Cordis 4.0.5 / Schemastery 3.18.5. Both passed automated official-service tests; live signed-Desktop evidence applies only to 0.2.1-rc.1. Unknown or mixed core versions must fail closed. Do not replace an unavailable Desktop bridge with a new DSH CLI/Web process or bypass version/authentication checks.
+Use this plugin for delegation to the existing Desktop Host. Supported combinations are DSH 0.2.0-rc.2 / Cordis 4.0.4 / Schemastery 3.18.4, and DSH 0.2.1-rc.1 or 0.2.1-rc.2 / Cordis 4.0.5 / Schemastery 3.18.5. DSH core packages must all match one release. Do not replace an unavailable bridge with a new DSH CLI/Web process or bypass version/authentication checks.
 
 Call `dsh_setup_info` for local configuration status and the installed plugin's exact setup/adapter paths. It is read-only. For an authorized setup request, run the returned setup command; it creates private default-deny configuration or validates existing configuration without rotating credentials. Desktop adapter installation must happen through the official Plugins surface or returned Desktop-owned command after the human has saved current work and quit Desktop. Do not quit the application or alter shell startup files automatically. Run `dsh_connection_info` to confirm a live connection; configuration validity alone does not establish connectivity.
 

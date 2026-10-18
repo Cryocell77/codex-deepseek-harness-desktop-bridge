@@ -25,17 +25,17 @@ DSH 仍会请求其已配置的模型服务。这项设计减少密钥复制，�
 
 ## 兼容性与状态
 
-**实验性 v0.2.1。** 测试覆盖范围及已知限制见[验证记录](docs/VALIDATION.md)。
+**实验性 v0.2.1-rc2。** 测试覆盖范围及已知限制见[验证记录](docs/VALIDATION.md)。
 
-| 组件        | 要求 / 已验证范围                                                                             |
-| ----------- | --------------------------------------------------------------------------------------------- |
-| DSH Desktop | 官方 macOS **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / Cordis 4.0.5**；仅接受完整精确组合 |
-| Codex       | 支持便携 Agent Plugins 格式的本地 Desktop/CLI；已验证 CLI **0.163.0-alpha.10.2** 可发现插件   |
-| Node.js     | **>=22.19.0**，Codex 能够找到该可执行程序                                                     |
-| Git         | 创建仓库 worktree 时需要                                                                      |
-| 其他平台    | Linux 传输可测试，但不宣称兼容 Linux Desktop；尚未实现 Windows 传输                           |
+| 组件        | 要求 / 已验证范围                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------------- |
+| DSH Desktop | 官方 macOS **0.2.0-rc.2 / Cordis 4.0.4** 或 **0.2.1-rc.1 / 0.2.1-rc.2（Cordis 4.0.5）**；仅接受完整精确组合 |
+| Codex       | 支持便携 Agent Plugins 格式的本地 Desktop/CLI；已验证 CLI **0.163.0-alpha.10.2** 可发现插件                 |
+| Node.js     | **>=22.19.0**，Codex 能够找到该可执行程序                                                                   |
+| Git         | 创建仓库 worktree 时需要                                                                                    |
+| 其他平台    | Linux 传输可测试，但不宣称兼容 Linux Desktop；尚未实现 Windows 传输                                         |
 
-仅支持上表列出的版本组合；其他版本或核心包混装会被拒绝。
+桥接版本 **v0.2.1-rc2** 对应 DSH Desktop **0.2.1-rc.2**，并保留上表中的旧版支持。仅接受这些完整版本组合；其他版本或核心包混装会被拒绝。
 
 新会话在创建时读取 Desktop 的**默认模型**，并使用获准的已安装 Preset。提供方和凭据继续由 Desktop 管理。Skills 按 DSH 原有规则在新工作区发现；不会复制已有聊天、单会话设置、未发送文本及主仓库未提交/忽略的项目文件。[复用范围](docs/USAGE.zh-CN.md)。
 
@@ -50,14 +50,14 @@ DSH 仍会请求其已配置的模型服务。这项设计减少密钥复制，�
 
 ### 1. 安装 Codex 插件
 
-从 GitHub 安装固定版本的插件市场（私有仓库需要你已获授权的 Git 访问权限）：
+从 GitHub 安装固定版本的插件市场：
 
 ```sh
-codex plugin marketplace add Cryocell77/codex-deepseek-harness-desktop-bridge --ref v0.2.1
+codex plugin marketplace add Cryocell77/codex-deepseek-harness-desktop-bridge --ref v0.2.1-rc2
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-也可以从 [v0.2.1 Release](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/releases/tag/v0.2.1) 下载 `dsh-desktop-codex-plugin-0.2.1.zip`。若从源码仓库构建安装包：
+也可以从 [v0.2.1-rc2 Release](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/releases/tag/v0.2.1-rc2) 下载 `dsh-desktop-codex-plugin-0.2.1-rc2.zip`。若从源码仓库构建安装包：
 
 ```sh
 npm ci
@@ -87,7 +87,7 @@ codex plugin add dsh-desktop@dsh-desktop-bridge
 
 > 调用 `dsh_connection_info`，报告运行时、适配器版本和有效权限，不要提交模型任务。
 
-应返回 `runtime: "existing-desktop"`，以及与连接桌面端一致的 `adapter: "dsh-v0.2.0-rc.2"` 或 `"dsh-v0.2.1-rc.1"`。`desktopVersion`、`cordisVersion` 返回实际检测组合，`supportedDesktops` 列出两组已测试版本。此操作检查桥接连接，不验证模型凭据。默认 `allowedTools: []` 允许模型对话，但拒绝全部模型工具调用。
+应返回 `runtime: "existing-desktop"`，以及与连接桌面端一致的 `adapter: "dsh-v0.2.0-rc.2"` 或 `"dsh-v0.2.1-rc.1"` / `"dsh-v0.2.1-rc.2"`。`desktopVersion`、`cordisVersion` 返回实际检测组合，`supportedDesktops` 列出三组已测试版本。此操作检查桥接连接，不验证模型凭据。默认 `allowedTools: []` 允许模型对话，但拒绝全部模型工具调用。
 
 需要独立 MCP 或自定义配置路径时，使用[替代安装指南](docs/STANDALONE-MCP.zh-CN.md)。Codex 侧选择一种注册方式，避免工具重复。
 

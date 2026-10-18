@@ -25,17 +25,17 @@ DSH still contacts its configured model provider. This design reduces credential
 
 ## Compatibility and status
 
-**Experimental v0.2.1.** See the [validation record](docs/VALIDATION.md) for test coverage and known limitations.
+**Experimental v0.2.1-rc2.** See the [validation record](docs/VALIDATION.md) for test coverage and known limitations.
 
 | Component       | Requirement / verified scope                                                                                  |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
-| DSH Desktop     | Official macOS **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / Cordis 4.0.5**; exact pairs only               |
+| DSH Desktop     | Official macOS **0.2.0-rc.2 / Cordis 4.0.4**, or **0.2.1-rc.1 / 0.2.1-rc.2 with Cordis 4.0.5**                |
 | Codex           | Local Desktop/CLI with portable Agent Plugins support; discovery verified with CLI **0.163.0-alpha.10.2**     |
 | Node.js         | **>=22.19.0**, accessible to Codex                                                                            |
 | Git             | Required for repository worktrees                                                                             |
 | Other platforms | Linux transport is testable; Linux Desktop compatibility is not claimed; Windows transport is not implemented |
 
-Only the version pairs listed above are supported. Other versions and mixed core packages are rejected.
+Bridge **v0.2.1-rc2** targets DSH Desktop **0.2.1-rc.2** and retains the older versions listed above. Only these complete combinations are supported. Other versions and mixed core packages are rejected.
 
 A new session takes the Desktop **default model at creation** and an allowlisted installed preset. Providers/credentials remain managed by Desktop. Skills follow normal DSH discovery in the new workspace; existing chats, per-chat overrides, unsaved text and uncommitted/ignored project files are not copied. [Reuse boundaries](docs/USAGE.md).
 
@@ -50,14 +50,14 @@ Installation has **two parts**:
 
 ### 1. Install the Codex plugin
 
-Install the tagged marketplace from GitHub (private repositories require your own authorized Git access):
+Install the tagged marketplace from GitHub:
 
 ```sh
-codex plugin marketplace add Cryocell77/codex-deepseek-harness-desktop-bridge --ref v0.2.1
+codex plugin marketplace add Cryocell77/codex-deepseek-harness-desktop-bridge --ref v0.2.1-rc2
 codex plugin add dsh-desktop@dsh-desktop-bridge
 ```
 
-Alternatively, download `dsh-desktop-codex-plugin-0.2.1.zip` from the [v0.2.1 release](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/releases/tag/v0.2.1). To build the archive from this source checkout:
+Alternatively, download `dsh-desktop-codex-plugin-0.2.1-rc2.zip` from the [v0.2.1-rc2 release](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/releases/tag/v0.2.1-rc2). To build the archive from this source checkout:
 
 ```sh
 npm ci
@@ -87,7 +87,7 @@ Save active work and **fully quit DSH Desktop**, then install the staged adapter
 
 > Call `dsh_connection_info`. Report the runtime, adapter version and effective permissions without submitting a model task.
 
-Expect `runtime: "existing-desktop"` and `adapter: "dsh-v0.2.0-rc.2"` or `"dsh-v0.2.1-rc.1"`, matching the connected Desktop. `desktopVersion` and `cordisVersion` report the detected pair; `supportedDesktops` lists both tested pairs. This checks the bridge connection; it does not validate provider credentials. Default `allowedTools: []` permits conversation while denying every model tool call.
+Expect `runtime: "existing-desktop"` and `adapter: "dsh-v0.2.0-rc.2"` or `"dsh-v0.2.1-rc.1"` / `"dsh-v0.2.1-rc.2"`, matching the connected Desktop. `desktopVersion` and `cordisVersion` report the detected pair; `supportedDesktops` lists all three tested combinations. This checks the bridge connection; it does not validate provider credentials. Default `allowedTools: []` permits conversation while denying every model tool call.
 
 For standalone MCP or custom configuration paths, follow the [alternative setup guide](docs/STANDALONE-MCP.md). Choose one Codex registration route to avoid duplicate tools.
 

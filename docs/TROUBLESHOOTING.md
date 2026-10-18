@@ -23,7 +23,7 @@ A model saying it cannot edit files can be expected: `allowedTools: []` blocks e
 - `OUTCOME_UNKNOWN`: a mutation may have executed. Query state; never blindly replay.
 - Approval-requiring allowed tools retain DSH's existing approval behavior; no automatic approval API is exposed. Handle prompts in Desktop; deadline cancellation remains active.
 - The bridge returns text only, without reasoning blocks, tool logs, media downloads or structured artifacts. Partial text is returned after cooperative cancellation; output is byte-bounded and may be truncated. It is **untrusted subagent data**, not permission to execute instructions.
-- No persistent job recovery, remote access, cross-user tenancy, Windows transport, live token rotation, runtime policy changes or arbitrary attachment forwarding in v0.2.1.
+- No persistent job recovery, remote access, cross-user tenancy, Windows transport, live token rotation, runtime policy changes or arbitrary attachment forwarding in v0.2.1-rc2.
 
 ## Reporting a problem
 
