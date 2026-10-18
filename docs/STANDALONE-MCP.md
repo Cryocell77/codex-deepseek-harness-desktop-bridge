@@ -4,6 +4,8 @@
 
 Use this route if you want only the MCP server, are developing the bridge, or your Codex client cannot load the portable plugin format. **Choose either this route or the Codex plugin route** to avoid registering the same tools twice. Both routes require the same Desktop adapter and permissions.
 
+To install a published package without a source checkout, use the [npm guide](NPM.md).
+
 ## Build and prepare the Desktop archive
 
 Requirements: macOS, official DSH Desktop **0.2.0-rc.2 / Cordis 4.0.4** or **0.2.1-rc.1 / 0.2.1-rc.2 with Cordis 4.0.5**, Node **>=22.19.0**, npm, and Git for worktrees. Other DSH versions and mixed core packages are rejected. See [validation](VALIDATION.md) for test coverage and limitations.

@@ -45,7 +45,8 @@
     "format": "prettier --write src tests scripts .github *.json *.md examples docs locale cordis.patch.yml icon.svg --ignore-unknown .agents plugins --ignore-path .prettierignore",
     "package:plugin": "npm run build && node scripts/package-plugin.mjs",
     "verify:plugin": "node scripts/verify-plugin.mjs",
-    "test:compatibility": "npm run build && node scripts/test-compatibility.mjs"
+    "test:compatibility": "npm run build && node scripts/test-compatibility.mjs",
+    "verify:npm": "node scripts/verify-npm-install.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
@@ -99,5 +100,31 @@
     "@deepseek-ai/cordis-plugin-loader": "1.0.6",
     "@deepseek-ai/cordis": "4.0.5",
     "@deepseek-ai/schemastery": "3.18.5"
+  },
+  "author": {
+    "name": "Cryocell77",
+    "url": "https://github.com/Cryocell77"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge.git"
+  },
+  "homepage": "https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "codex",
+    "deepseek",
+    "deepseek-harness",
+    "desktop",
+    "subagent"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public",
+    "tag": "next"
   }
 }

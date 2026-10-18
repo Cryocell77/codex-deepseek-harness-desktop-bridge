@@ -89,7 +89,7 @@ Save active work and **fully quit DSH Desktop**, then install the staged adapter
 
 Expect `runtime: "existing-desktop"` and `adapter: "dsh-v0.2.0-rc.2"` or `"dsh-v0.2.1-rc.1"` / `"dsh-v0.2.1-rc.2"`, matching the connected Desktop. `desktopVersion` and `cordisVersion` report the detected pair; `supportedDesktops` lists all three tested combinations. This checks the bridge connection; it does not validate provider credentials. Default `allowedTools: []` permits conversation while denying every model tool call.
 
-For standalone MCP or custom configuration paths, follow the [alternative setup guide](docs/STANDALONE-MCP.md). Choose one Codex registration route to avoid duplicate tools.
+For installation from npm, follow the [npm guide](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/blob/main/docs/NPM.md). For a source build or custom configuration paths, follow the [standalone setup guide](docs/STANDALONE-MCP.md). Choose one Codex registration route to avoid duplicate tools.
 
 ## Usage examples
 

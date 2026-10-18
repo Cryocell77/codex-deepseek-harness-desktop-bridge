@@ -89,7 +89,7 @@ codex plugin add dsh-desktop@dsh-desktop-bridge
 
 应返回 `runtime: "existing-desktop"`，以及与连接桌面端一致的 `adapter: "dsh-v0.2.0-rc.2"` 或 `"dsh-v0.2.1-rc.1"` / `"dsh-v0.2.1-rc.2"`。`desktopVersion`、`cordisVersion` 返回实际检测组合，`supportedDesktops` 列出三组已测试版本。此操作检查桥接连接，不验证模型凭据。默认 `allowedTools: []` 允许模型对话，但拒绝全部模型工具调用。
 
-需要独立 MCP 或自定义配置路径时，使用[替代安装指南](docs/STANDALONE-MCP.zh-CN.md)。Codex 侧选择一种注册方式，避免工具重复。
+通过 npm 安装请参阅 [npm 指南](https://github.com/Cryocell77/codex-deepseek-harness-desktop-bridge/blob/main/docs/NPM.zh-CN.md)；源码构建或自定义配置路径参阅[独立 MCP 指南](docs/STANDALONE-MCP.zh-CN.md)。Codex 侧选择一种注册方式，避免工具重复。
 
 ## 使用示例
 
