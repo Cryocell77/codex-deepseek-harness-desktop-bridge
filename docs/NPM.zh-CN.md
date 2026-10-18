@@ -19,7 +19,7 @@ npx --yes --package dsh-desktop-mcp-bridge@0.2.1-rc2 dsh-desktop-mcp setup
 保存任务并完全退出官方 DSH Desktop，再使用应用自带安装器：
 
 ```sh
-"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add dsh-desktop-mcp-bridge@0.2.1-rc2
+"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add dsh-desktop-mcp-bridge@0.2.1-rc2 --save-exact
 ```
 
 应用安装位置不同时请调整路径。此命令将插件安装到 Desktop Profile，不会启动独立 Harness 运行时。完成后重新打开 Desktop。

@@ -19,7 +19,7 @@ This creates the default private state/workspace directories or validates existi
 Save work and fully quit official DSH Desktop, then install the package using its application-owned installer:
 
 ```sh
-"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add dsh-desktop-mcp-bridge@0.2.1-rc2
+"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" plugin --profile desktop add dsh-desktop-mcp-bridge@0.2.1-rc2 --save-exact
 ```
 
 Use the actual application path if installed elsewhere. This command installs a plugin into the Desktop profile; it does not launch a separate Harness runtime. Reopen Desktop afterwards.
